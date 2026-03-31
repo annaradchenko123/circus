@@ -3,113 +3,253 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Игра: Силомер</title>
+    <title>Игра: Силомер (16:9)</title>
     <style>
-        /* Базовые стили для ретро-автомата */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1a1a2e; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
-        #game-container { width: 400px; height: 700px; background: linear-gradient(180deg, #16213e 0%, #0f3460 100%); border: 8px solid #e94560; border-radius: 20px; box-shadow: 0 0 20px #e94560; position: relative; display: flex; flex-direction: column; align-items: center; padding: 20px; box-sizing: border-box; }
+        /* Базовые стили центрирования на экране */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #111; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         
-        /* Табло и прогресс */
-        #header { width: 100%; display: flex; justify-content: space-between; margin-bottom: 20px; font-weight: bold; font-size: 1.2rem; }
-        .digital-display { background-color: #000; color: #0f0; padding: 5px 15px; border-radius: 5px; font-family: monospace; font-size: 1.5rem; }
-        
-        /* Вопрос */
-        #question-display { background-color: #fff; color: #000; width: 100%; min-height: 80px; padding: 15px; border-radius: 10px; text-align: center; font-size: 1.2rem; font-weight: bold; box-sizing: border-box; margin-bottom: 20px; border: 4px solid #f9a826; }
-        
-        /* Шкала и ползунок */
-        #scale-container { flex-grow: 1; width: 100%; position: relative; display: flex; flex-direction: column; justify-content: space-around; margin-bottom: 20px; border-left: 4px solid #fff; border-right: 4px solid #fff; background: rgba(0,0,0,0.3); padding: 10px 0; }
-        .answer-slot { background-color: rgba(255, 255, 255, 0.1); border: 2px solid #aaa; padding: 15px; text-align: center; border-radius: 8px; margin: 0 40px; transition: all 0.3s; position: relative; z-index: 1; }
-        .answer-slot.correct { border-color: #4cd137; } /* Для теста, потом уберем */
-        
-        #slider { position: absolute; width: 120%; left: -10%; height: 20px; background-color: #e94560; border-radius: 10px; box-shadow: 0 0 15px #e94560; z-index: 2; /* Управляется через JS */ }
-        
-        /* Кнопка */
-        #hammer-btn { width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle, #ff4757 0%, #ff6b81 100%); border: 8px solid #c0392b; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 1.2rem; font-weight: bold; color: white; text-transform: uppercase; box-shadow: 0 10px 0 #8e44ad, 0 15px 20px rgba(0,0,0,0.5); transition: all 0.1s; flex-shrink: 0; }
-        #hammer-btn:active { transform: translateY(10px); box-shadow: 0 0 0 #8e44ad, 0 5px 10px rgba(0,0,0,0.5); }
+        /* Главный контейнер игры - Строгий формат 16:9 */
+        #game-wrapper {
+            width: 100%;
+            max-width: 1280px; /* Максимальная ширина */
+            aspect-ratio: 16 / 9; /* Пропорция Genially */
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0f172a 100%);
+            position: relative;
+            display: flex;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            border: 2px solid #334155;
+        }
+
+        /* ЛЕВАЯ ПАНЕЛЬ: Силомер (35% ширины) */
+        #left-panel {
+            width: 35%;
+            height: 100%;
+            /* СЮДА В БУДУЩЕМ ВСТАВИМ ВАШУ КАРТИНКУ СИЛОМЕРА */
+            /* background-image: url('ваша_картинка.png'); background-size: contain; background-repeat: no-repeat; background-position: bottom center; */
+            background-color: rgba(0, 0, 0, 0.4);
+            border-right: 2px dashed #475569;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 30px 10px;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Табло счета на силомере */
+        #score-display {
+            background-color: #000;
+            color: #0f0;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 2.5rem;
+            border: 4px solid #333;
+            box-shadow: inset 0 0 10px #0f0;
+        }
+
+        /* Шкала силомера (труба, по которой бегает ползунок) */
+        #track {
+            flex-grow: 1;
+            width: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #cbd5e1;
+            border-right: 4px solid #cbd5e1;
+            border-radius: 20px;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        /* Ползунок */
+        #slider {
+            position: absolute;
+            width: 160%;
+            left: -30%;
+            height: 24px;
+            background-color: #e94560;
+            border-radius: 12px;
+            box-shadow: 0 0 15px #e94560, inset 0 0 5px rgba(255,255,255,0.8);
+            z-index: 5;
+        }
+
+        /* Линия-указатель от ползунка к ответам */
+        #slider-pointer {
+            position: absolute;
+            width: 800px; /* Длинная линия вправо */
+            height: 2px;
+            background: linear-gradient(90deg, #e94560 0%, rgba(233, 69, 96, 0) 100%);
+            top: 50%;
+            left: 100%;
+            transform: translateY(-50%);
+            pointer-events: none; /* Чтобы не мешала кликать */
+            z-index: 1;
+        }
+
+        /* Кнопка удара */
+        #hammer-btn {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ff4757 0%, #c0392b 100%);
+            border: 8px solid #7f8c8d;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+            box-shadow: 0 15px 0 #8e44ad, 0 20px 25px rgba(0,0,0,0.6);
+            transition: all 0.1s;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+        #hammer-btn:active { transform: translateY(15px); box-shadow: 0 0 0 #8e44ad, 0 5px 10px rgba(0,0,0,0.6); }
         #hammer-btn:disabled { filter: grayscale(100%); cursor: not-allowed; }
 
-        /* Фидбек */
-        #feedback-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-        #feedback-text { font-size: 3rem; font-weight: bold; text-align: center; text-transform: uppercase; text-shadow: 0 0 10px currentColor; }
-        #feedback-points { font-size: 2rem; margin-top: 10px; font-family: monospace; }
+        /* ПРАВАЯ ПАНЕЛЬ: Вопросы и ответы (65% ширины) */
+        #right-panel {
+            width: 65%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 40px;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Верхняя часть с прогрессом и вопросом */
+        #header-info { text-align: right; color: #94a3b8; font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; }
+        #question-display {
+            background-color: white;
+            color: #1e293b;
+            padding: 25px;
+            border-radius: 15px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-align: center;
+            border: 5px solid #f59e0b;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.3);
+            margin-bottom: 40px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Контейнер вариантов ответов */
+        #answers-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around; /* Равномерно распределяет ответы по высоте */
+            padding-left: 20px;
+        }
+
+        .answer-slot {
+            background-color: #334155;
+            border: 3px solid #64748b;
+            padding: 20px;
+            font-size: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+        }
+
+        /* Фидбек (Отлично/Промах) */
+        #feedback-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(4px); }
+        #feedback-text { font-size: 5rem; font-weight: bold; text-align: center; text-transform: uppercase; text-shadow: 0 0 20px currentColor; margin-bottom: 20px; }
+        #feedback-points { font-size: 3.5rem; font-family: monospace; font-weight: bold; background: #000; padding: 10px 30px; border-radius: 15px; }
 
         /* Финальный экран */
-        #final-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #16213e; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20; display: none; text-align: center; }
-        .restart-btn { margin-top: 30px; padding: 15px 30px; background-color: #e94560; color: white; border: none; border-radius: 10px; font-size: 1.2rem; cursor: pointer; }
+        #final-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 30; display: none; }
+        #final-screen h2 { font-size: 4rem; margin: 0; color: #f8fafc; }
+        .restart-btn { margin-top: 40px; padding: 20px 50px; background-color: #e94560; color: white; border: none; border-radius: 15px; font-size: 1.8rem; font-weight: bold; cursor: pointer; transition: transform 0.2s; box-shadow: 0 10px 0 #c0392b; }
+        .restart-btn:hover { transform: scale(1.05); }
+        .restart-btn:active { transform: translateY(10px); box-shadow: 0 0 0 #c0392b; }
     </style>
 </head>
 <body>
 
-<div id="game-container">
-    <div id="header">
-        <div>Вопрос: <span id="progress">1/3</span></div>
-        <div class="digital-display" id="score">0</div>
+<div id="game-wrapper">
+    <!-- Левая панель: Силомер -->
+    <div id="left-panel">
+        <div id="score-display">0</div>
+        
+        <div id="track">
+            <div id="slider">
+                <!-- Лазерная указка -->
+                <div id="slider-pointer"></div>
+            </div>
+        </div>
+
+        <button id="hammer-btn">УДАР!</button>
     </div>
 
-    <div id="question-display">Загрузка вопроса...</div>
-
-    <div id="scale-container">
-        <div id="slider"></div>
-        <!-- Варианты ответов будут генерироваться здесь -->
+    <!-- Правая панель: Вопросы и ответы -->
+    <div id="right-panel">
+        <div id="header-info">Вопрос: <span id="progress">1/3</span></div>
+        <div id="question-display">Загрузка вопроса...</div>
+        
+        <div id="answers-container">
+            <!-- Сюда JS вставляет варианты ответов -->
+        </div>
     </div>
 
-    <button id="hammer-btn">УДАР!</button>
-
+    <!-- Экраны обратной связи и финала -->
     <div id="feedback-overlay">
-        <div id="feedback-text"></div>
-        <div id="feedback-points"></div>
+        <div id="feedback-text">ОТЛИЧНО!</div>
+        <div id="feedback-points">+100</div>
     </div>
 
     <div id="final-screen">
-        <h2>Игра завершена!</h2>
-        <div class="digital-display" id="final-score" style="font-size: 3rem; margin: 20px 0;">0</div>
-        <h3 id="final-rank" style="color: #f9a826; font-size: 1.5rem;">Ранг</h3>
-        <button class="restart-btn" onclick="initGame()">Играть снова</button>
+        <h2>ИГРА ЗАВЕРШЕНА</h2>
+        <div id="final-score" style="font-size: 6rem; font-family: monospace; color: #0f0; margin: 20px 0;">1200</div>
+        <div id="final-rank" style="color: #f59e0b; font-size: 3rem; text-transform: uppercase; font-weight: bold;">Мастер силы!</div>
+        <button class="restart-btn" onclick="initGame()">ИГРАТЬ СНОВА</button>
     </div>
 </div>
 
 <script>
-    /* =========================================
-       КОНФИГУРАЦИЯ (То, что будет в редакторе Genially)
-       ========================================= */
+    // КОНФИГУРАЦИЯ (Будет настраиваться в Genially)
     const gameConfig = {
-        sliderSpeedMultiplier: 1.5, // Скорость бегунка
-        points: {
-            perfect: 100, // Точное попадание
-            good: 70,     // Попадание с погрешностью
-            wrong: -80,   // Неправильный ответ
-            miss: -50     // Промах мимо вариантов
-        },
-        // Массив вопросов (в прототипе 3, по ТЗ должно быть 12)
+        sliderSpeedMultiplier: 1.5,
+        points: { perfect: 100, good: 70, wrong: -80, miss: -50 },
         questions: [
-            { text: "В каком году человек полетел в космос?", options: ["1957", "1961", "1969", "1975"], correctIndex: 1 },
-            { text: "Какая планета самая большая в Солнечной системе?", options: ["Земля", "Марс", "Юпитер"], correctIndex: 2 },
-            { text: "Сколько будет 7 умножить на 8?", options: ["54", "56", "64", "48"], correctIndex: 1 }
+            { text: "Какая планета самая большая в Солнечной системе?", options: ["Земля", "Марс", "Юпитер", "Сатурн"], correctIndex: 2 },
+            { text: "Сколько будет 7 умножить на 8?", options: ["54", "56", "64"], correctIndex: 1 },
+            { text: "В каком году человек впервые полетел в космос?", options: ["1957", "1961", "1969", "1975"], correctIndex: 1 }
         ],
         ranks: [
             { minScore: 0, title: "Новичок" },
             { minScore: 150, title: "Эксперт" },
-            { minScore: 250, title: "Мастер силы!" } // Настроить под 1200 очков в финале
+            { minScore: 250, title: "Мастер силы!" }
         ]
     };
 
-    /* =========================================
-       ИГРОВОЙ ДВИЖОК
-       ========================================= */
+    // ПЕРЕМЕННЫЕ ДВИЖКА
     let currentQuestionIndex = 0;
     let score = 0;
     let animationFrameId;
     let sliderY = 0;
-    let direction = 1;
+    let direction = 1; // 1 = вниз, -1 = вверх
     let isPlaying = false;
-    let sliderSpeed = 2 * gameConfig.sliderSpeedMultiplier;
+    let sliderSpeed = 4 * gameConfig.sliderSpeedMultiplier;
 
-    // DOM Элементы
+    // DOM ЭЛЕМЕНТЫ
     const ui = {
         progress: document.getElementById('progress'),
-        score: document.getElementById('score'),
+        score: document.getElementById('score-display'),
         question: document.getElementById('question-display'),
-        scale: document.getElementById('scale-container'),
+        answersBox: document.getElementById('answers-container'),
+        track: document.getElementById('track'),
         slider: document.getElementById('slider'),
         btn: document.getElementById('hammer-btn'),
         feedback: document.getElementById('feedback-overlay'),
@@ -138,19 +278,17 @@
         ui.progress.innerText = `${currentQuestionIndex + 1} / ${gameConfig.questions.length}`;
         ui.question.innerText = qData.text;
 
-        // Очистка и рендер вариантов ответов
-        ui.scale.innerHTML = '<div id="slider"></div>';
-        ui.slider = document.getElementById('slider'); // Обновляем ссылку
-        
+        // Генерация ответов
+        ui.answersBox.innerHTML = '';
         qData.options.forEach((opt, index) => {
             const div = document.createElement('div');
             div.className = 'answer-slot';
             div.innerText = opt;
             div.dataset.index = index;
-            ui.scale.appendChild(div);
+            ui.answersBox.appendChild(div);
         });
 
-        // Сброс параметров бегунка
+        // Сброс бегунка
         sliderY = 0;
         direction = 1;
         ui.btn.disabled = false;
@@ -163,9 +301,11 @@
     function animateSlider() {
         if (!isPlaying) return;
 
-        const maxH = ui.scale.clientHeight - ui.slider.clientHeight;
+        // Вычисляем границы движения по трубе
+        const maxH = ui.track.clientHeight - ui.slider.clientHeight;
         sliderY += sliderSpeed * direction;
 
+        // Отскок от краев
         if (sliderY >= maxH) {
             sliderY = maxH;
             direction = -1;
@@ -178,32 +318,32 @@
         animationFrameId = requestAnimationFrame(animateSlider);
     }
 
-    ui.btn.addEventListener('click', () => {
+    ui.btn.addEventListener('mousedown', () => { // mousedown реагирует быстрее click
         if (!isPlaying) return;
         isPlaying = false;
         cancelAnimationFrame(animationFrameId);
         ui.btn.disabled = true;
-
         checkHit();
     });
 
     function checkHit() {
         const sliderRect = ui.slider.getBoundingClientRect();
-        const sliderCenter = sliderRect.top + (sliderRect.height / 2);
+        // Используем центр красной линии указки для проверки
+        const hitLineY = sliderRect.top + (sliderRect.height / 2); 
         
         const slots = document.querySelectorAll('.answer-slot');
         let hitIndex = -1;
-        let accuracy = 0; // 0..1 (где 1 - идеально по центру)
+        let accuracy = 0;
 
         slots.forEach((slot, index) => {
             const rect = slot.getBoundingClientRect();
-            // Проверяем пересечение центра ползунка и блока ответа
-            if (sliderCenter >= rect.top && sliderCenter <= rect.bottom) {
+            // Если горизонтальный лазер пересекает карточку ответа
+            if (hitLineY >= rect.top && hitLineY <= rect.bottom) {
                 hitIndex = index;
                 const slotCenter = rect.top + (rect.height / 2);
                 const maxDeviation = rect.height / 2;
-                const deviation = Math.abs(slotCenter - sliderCenter);
-                accuracy = 1 - (deviation / maxDeviation); // от 0 (край) до 1 (центр)
+                const deviation = Math.abs(slotCenter - hitLineY);
+                accuracy = 1 - (deviation / maxDeviation); // от 0 до 1 (1 = идеально в центр)
             }
         });
 
@@ -216,27 +356,35 @@
         let message = "";
         let color = "";
 
+        // Визуальная подсветка выбранного ответа
+        const slots = document.querySelectorAll('.answer-slot');
+        if (hitIndex !== -1) {
+            slots[hitIndex].style.transform = 'scale(1.05)';
+            slots[hitIndex].style.borderWidth = '6px';
+        }
+
         if (hitIndex === -1) {
-            // Промах мимо кнопок
             pointsEarned = gameConfig.points.miss;
             message = "ПРОМАХ!";
-            color = "#8395a7";
+            color = "#94a3b8"; // Серый
         } else if (hitIndex === correctIndex) {
-            // Попал в правильный ответ, проверяем точность (аналог ±0.3 сек)
-            if (accuracy > 0.6) { // Близко к центру
+            slots[hitIndex].style.borderColor = "#22c55e"; // Зеленый
+            slots[hitIndex].style.backgroundColor = "#166534";
+            if (accuracy > 0.6) { 
                 pointsEarned = gameConfig.points.perfect;
                 message = "ИДЕАЛЬНО!";
-                color = "#4cd137";
-            } else { // Зацепил край
+                color = "#22c55e";
+            } else { 
                 pointsEarned = gameConfig.points.good;
                 message = "ОТЛИЧНО!";
-                color = "#fbc531";
+                color = "#eab308";
             }
         } else {
-            // Попал в неправильный ответ
+            slots[hitIndex].style.borderColor = "#ef4444"; // Красный
+            slots[hitIndex].style.backgroundColor = "#7f1d1d";
             pointsEarned = gameConfig.points.wrong;
             message = "НЕВЕРНО!";
-            color = "#e84118";
+            color = "#ef4444";
         }
 
         updateScore(pointsEarned);
@@ -246,12 +394,12 @@
         setTimeout(() => {
             currentQuestionIndex++;
             loadQuestion();
-        }, 2000);
+        }, 2000); // 2 секунды на просмотр результата
     }
 
     function updateScore(points) {
         score += points;
-        if(score < 0) score = 0; // Защита от отрицательного счета (опционально)
+        if(score < 0) score = 0;
         ui.score.innerText = score;
     }
 
@@ -260,7 +408,6 @@
         ui.fText.style.color = color;
         ui.fPoints.innerText = points > 0 ? `+${points}` : points;
         ui.fPoints.style.color = color;
-        
         ui.feedback.style.opacity = '1';
     }
 
@@ -268,7 +415,6 @@
         ui.finalScreen.style.display = 'flex';
         ui.finalScore.innerText = score;
         
-        // Определение ранга
         let rankStr = gameConfig.ranks[0].title;
         for (let i = gameConfig.ranks.length - 1; i >= 0; i--) {
             if (score >= gameConfig.ranks[i].minScore) {
@@ -279,7 +425,7 @@
         ui.finalRank.innerText = rankStr;
     }
 
-    // Запуск игры
+    // Старт игры
     initGame();
 </script>
 </body>
