@@ -64,10 +64,10 @@
             background-repeat: no-repeat;
         }
 
-        /* ПЛАШКА ДЛЯ ОБЩИХ ОЧКОВ НАВЕРХУ */
+        /* ПЛАШКА ДЛЯ ОЧКОВ (Поднята выше, чтобы закрыть лампочки) */
         #score-wrapper {
             position: absolute;
-            top: 0%; 
+            top: -8%; /* Поднято наверх за пределы автомата */
             left: 50%;
             transform: translateX(-50%);
             width: 240px;  
@@ -82,11 +82,11 @@
             z-index: 10;
         }
 
-        /* ШРИФТ ИТОГОВЫХ ОЧКОВ (УМЕНЬШЕН) */
+        /* Сами цифры очков */
         #score-display {
-            color: #ffd700; 
+            color: #ffd700; /* Золотисто-желтый цвет */
             font-weight: 900;
-            font-size: 2.4rem; /* Уменьшили шрифт, чтобы аккуратно влезал в картинку */
+            font-size: 2.4rem; 
             text-shadow: 0 3px 6px rgba(0,0,0,0.8); 
             transition: transform 0.2s;
             margin-top: -5px; 
@@ -105,26 +105,26 @@
             z-index: 5;
         }
 
-        /* КРУГЛЫЙ МИНИАТЮРНЫЙ КУРСОР (#f7f3c1) */
+        /* КРУГЛЫЙ МИНИАТЮРНЫЙ КУРСОР (Цвет золотистый под очки) */
         #slider {
             position: absolute;
             box-sizing: border-box;
             width: 24px;       
             height: 24px;      
             left: -7px;        
-            background: #f7f3c1; 
+            background: #ffd700; /* Цвет мэтчится с очками */
             border-radius: 50%; 
             border: 2px solid white;
-            box-shadow: 0 0 10px rgba(247, 243, 193, 0.9); 
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.8); 
             z-index: 6;
         }
 
-        /* ЛАЗЕР (#f7f3c1) */
+        /* ЛАЗЕР (Цвет золотистый под очки) */
         #slider-pointer {
             position: absolute;
             width: 1000px;
             height: 3px; 
-            background: linear-gradient(90deg, rgba(247, 243, 193, 0.8) 0%, rgba(247, 243, 193, 0) 100%); 
+            background: linear-gradient(90deg, rgba(255, 215, 0, 0.9) 0%, rgba(255, 215, 0, 0) 100%); 
             top: 50%;
             left: 100%;
             transform: translateY(-50%);
@@ -132,11 +132,11 @@
             z-index: 1;
         }
 
-        /* КНОПКА УДАРА (Смещена влево) */
+        /* КНОПКА УДАРА (Смещена чуть правее для центровки) */
         #hammer-btn {
             position: absolute;
             bottom: 8%; 
-            left: 48%; /* Смещено влево */
+            left: 49.5%; /* Чуть сдвинули вправо (было 48%) */
             transform: translateX(-50%);
             width: 90px;  
             height: 90px; 
@@ -217,12 +217,12 @@
             box-sizing: border-box;
         }
 
-        /* ВСПЛЫВАЮЩИЙ ФИДБЕК ЗА УДАР (Размер шрифта возвращен к крупному) */
+        /* ВСПЛЫВАЮЩИЙ ФИДБЕК ЗА УДАР */
         #feedback-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
         #feedback-text { font-size: 5rem; font-weight: 900; text-align: center; text-transform: uppercase; text-shadow: 0 4px 15px rgba(0,0,0,0.4); margin-bottom: 15px; letter-spacing: 2px; }
         
         #feedback-points { 
-            font-size: 3.5rem; /* Вернул крупный размер для красивого эффекта */
+            font-size: 3.5rem; 
             font-weight: 700; 
             background: rgba(255, 255, 255, 0.95); 
             padding: 10px 40px; 
@@ -536,7 +536,7 @@
     }
 
     function fireConfetti() {
-        confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 }, colors: ['#f7f3c1', '#f1c40f', '#2ecc71', '#3498db'] });
+        confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 }, colors: ['#ffd700', '#f1c40f', '#2ecc71', '#3498db'] });
     }
 
     function endGame() {
