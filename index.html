@@ -223,7 +223,6 @@
             outline: none;
             -webkit-tap-highlight-color: transparent;
         }
-        /* Вдавливание при клике МЫШКОЙ или ПРОБЕЛОМ (.pressed) */
         #hammer-btn:active, #hammer-btn.pressed { transform: translate(-50%, 8px) scale(0.95); }
         #hammer-btn:disabled { filter: grayscale(100%); cursor: not-allowed; opacity: 0.8; }
 
@@ -314,10 +313,9 @@
 </head>
 <body>
 
-<!-- АУДИО ФОНОВОЙ МУЗЫКИ -->
-<!-- Вы можете поменять ссылку внутри src="" на свою музыку .mp3, если захотите -->
-<audio id="bg-music" loop>
-    <source src="https://upload.wikimedia.org/wikipedia/commons/e/eb/The_Entertainer_-_Scott_Joplin.ogg" type="audio/ogg">
+<!-- АУДИО ФОНОВОЙ МУЗЫКИ (Надежный MP3) -->
+<audio id="bg-music" loop preload="auto" crossorigin="anonymous">
+    <source src="https://freepd.com/music/The%20Entertainer.mp3" type="audio/mpeg">
 </audio>
 
 <div id="game-wrapper">
@@ -384,7 +382,7 @@
         gainNode.connect(audioCtx.destination);
         const now = audioCtx.currentTime;
         
-        // Приглушаем музыку во время звуковых эффектов (Ducking)
+        // Приглушаем музыку (Ducking), чтобы было слышно эффекты
         bgMusic.volume = 0.05;
 
         if (type === 'hit') { 
@@ -395,8 +393,11 @@
             gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
             osc.start(now); osc.stop(now + 0.1);
             
-            // Восстанавливаем музыку быстро, если только удар
-            setTimeout(() => { if(isPlaying) bgMusic.volume = 0.2; }, 150);
+            // Если это просто удар (а не результат ответа), возвращаем музыку быстро
+            setTimeout(() => { 
+                if(ui.finalScreen.style.display !== 'flex') bgMusic.volume = 0.2; 
+            }, 300);
+
         } else if (type === 'success') { 
             osc.type = 'sine';
             osc.frequency.setValueAtTime(440, now);
@@ -406,8 +407,11 @@
             gainNode.gain.linearRampToValueAtTime(0, now + 0.5);
             osc.start(now); osc.stop(now + 0.5);
             
-            // Восстанавливаем музыку после фанфар
-            setTimeout(() => { if(ui.finalScreen.style.display !== 'flex') bgMusic.volume = 0.2; }, 1000);
+            // Возвращаем музыку после фанфар
+            setTimeout(() => { 
+                if(ui.finalScreen.style.display !== 'flex') bgMusic.volume = 0.2; 
+            }, 1500);
+
         } else if (type === 'error') { 
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(200, now);
@@ -416,7 +420,9 @@
             gainNode.gain.linearRampToValueAtTime(0, now + 0.4);
             osc.start(now); osc.stop(now + 0.4);
 
-            setTimeout(() => { if(ui.finalScreen.style.display !== 'flex') bgMusic.volume = 0.2; }, 1000);
+            setTimeout(() => { 
+                if(ui.finalScreen.style.display !== 'flex') bgMusic.volume = 0.2; 
+            }, 1000);
         }
     }
 
@@ -486,8 +492,9 @@
     // Запуск по кнопке "НАЧАТЬ"
     ui.startBtn.addEventListener('click', () => {
         if(audioCtx.state === 'suspended') audioCtx.resume();
-        // Включаем музыку
-        bgMusic.play().catch(() => console.log("Браузер заблокировал автоплей"));
+        
+        // Включаем музыку безопасно
+        bgMusic.play().catch((e) => console.log("Браузер пока заблокировал музыку:", e));
         
         ui.startScreen.style.opacity = '0';
         setTimeout(() => {
@@ -499,16 +506,16 @@
     // УДАР ПО ПРОБЕЛУ
     window.addEventListener('keydown', (e) => {
         if (e.code === 'Space') {
-            e.preventDefault(); // Запрещаем скроллинг страницы пробелом
+            e.preventDefault(); 
             if (!ui.btn.disabled && isPlaying) {
-                ui.btn.classList.add('pressed'); // Визуально нажимаем кнопку
+                ui.btn.classList.add('pressed'); 
                 handleHit();
             }
         }
     });
     window.addEventListener('keyup', (e) => {
         if (e.code === 'Space') {
-            ui.btn.classList.remove('pressed'); // Отпускаем кнопку
+            ui.btn.classList.remove('pressed'); 
         }
     });
 
@@ -572,7 +579,7 @@
         
         // ЭФФЕКТ ТРЯСКИ
         ui.machine.classList.remove('shake-effect');
-        void ui.machine.offsetWidth; // Магия браузера для перезапуска анимации
+        void ui.machine.offsetWidth; 
         ui.machine.classList.add('shake-effect');
 
         playSound('hit');
@@ -681,7 +688,7 @@
     }
 
     function endGame() {
-        bgMusic.volume = 0.02; // Тихо-тихо на экране завершения
+        bgMusic.volume = 0.02; // Музыка затихает в конце
         ui.progBar.style.width = '100%';
         ui.finalScreen.style.display = 'flex';
         ui.finalScore.innerText = score;
