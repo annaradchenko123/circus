@@ -291,10 +291,10 @@
         /* ФИЗИЧЕСКИЙ УДАР ПО КАРТОЧКЕ (Card Smash) */
         @keyframes cardSmash {
             0% { transform: translateX(0) scale(1); }
-            20% { transform: translateX(20px) rotate(3deg) scale(0.95); } /* Вдавливается и гнется от удара слева */
-            50% { transform: translateX(-5px) rotate(-1deg) scale(1.02); } /* Отпружинивает обратно */
+            20% { transform: translateX(20px) rotate(3deg) scale(0.95); } 
+            50% { transform: translateX(-5px) rotate(-1deg) scale(1.02); } 
             80% { transform: translateX(2px) rotate(1deg) scale(1.05); } 
-            100% { transform: translateX(0) rotate(0deg) scale(1.05); } /* Застывает чуть увеличенной */
+            100% { transform: translateX(0) rotate(0deg) scale(1.05); } 
         }
         .card-smash-anim {
             animation: cardSmash 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
@@ -568,23 +568,6 @@
         cancelAnimationFrame(animationFrameId);
         ui.btn.disabled = true;
 
-        // ВЗРЫВ ИСКР ИЗ ЛАЗЕРА (Impact Sparks)
-        const trackRect = ui.track.getBoundingClientRect();
-        const hitX = (trackRect.left + trackRect.width / 2) / window.innerWidth;
-        const hitY = (trackRect.top + laserY) / window.innerHeight;
-        
-        confetti({
-            particleCount: 60,
-            spread: 80,
-            startVelocity: 35,
-            origin: { x: hitX, y: hitY },
-            colors: ['#ffd700', '#ffffff', '#ff9e9e'],
-            ticks: 100,
-            gravity: 1.5,
-            scalar: 0.8,
-            zIndex: 100
-        });
-
         checkHit();
     }
 
@@ -632,7 +615,7 @@
             slots[hitIndex].style.borderColor = "#2ecc71"; 
             slots[hitIndex].style.backgroundColor = "#e8f8f5";
             playSound('success');
-            fireConfetti(); 
+            fireConfetti(); // Оставил салют только для правильного ответа
 
             if (accuracy > 0.6) { 
                 pointsEarned = gameConfig.points.perfect;
@@ -689,7 +672,7 @@
         
         if(points !== 0) {
             ui.score.classList.add('score-anim');
-            // Запускаем "накрутку" цифр (длительность 1 секунда = 1000 мс)
+            // Запускаем "накрутку" цифр
             animateScore(oldScore, score, 1000);
             setTimeout(() => ui.score.classList.remove('score-anim'), 300);
         }
