@@ -39,11 +39,11 @@
         .overlay-bg {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%);
+            background: linear-gradient(90deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.4) 100%);
             z-index: 1;
         }
 
-        /* ЛЕВАЯ ПАНЕЛЬ: Здесь находится ваша картинка силомера */
+        /* ЛЕВАЯ ПАНЕЛЬ: Автомат-силомер */
         #left-panel {
             width: 35%; 
             height: 100%;
@@ -57,17 +57,16 @@
             width: 100%;
             height: 90%;
             bottom: 5%;
-            /* ПРЯМАЯ ССЫЛКА НА ВАШЕ ИЗОБРАЖЕНИЕ */
-            background-image: url('https://i.postimg.cc/0KvV7vtC/image.png');
+            background-image: url('https://i.postimg.cc/L5YGK6LG/11-(10).png');
             background-size: contain;
             background-position: center bottom;
             background-repeat: no-repeat;
         }
 
-        /* Табло счета (размещено поверх картинки) */
+        /* Табло счета на автомате */
         #score-display {
             position: absolute;
-            top: 12%; /* Поднимайте или опускайте табло (в %) */
+            top: 13%; 
             left: 50%;
             transform: translateX(-50%);
             background-color: #111;
@@ -81,18 +80,17 @@
             transition: transform 0.2s;
             z-index: 10;
         }
-        .score-anim { transform: translate(-50%, 0) scale(1.2) !important; color: #fff !important; }
+        .score-anim { transform: translate(-50%, 0) scale(1.3) !important; color: #fff !important; }
 
-        /* НАСТРОЙКА ШКАЛЫ (ТРУБЫ) */
-        /* Если ползунок не совпадает с нарисованной трубой - измените top и height */
+        /* НАСТРОЙКА ШКАЛЫ (Невидимая труба для бегунка) */
         #track {
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            top: 28%;      /* Начало трубы (сверху вниз) */
-            height: 48%;   /* Длина трубы */
+            top: 26%;      
+            height: 50%;   
             width: 10px;
-            background: rgba(255, 255, 255, 0.05); /* Почти невидимая направляющая */
+            background: rgba(255, 255, 255, 0.05); 
             z-index: 5;
         }
 
@@ -123,35 +121,35 @@
             box-shadow: 0 0 10px #ff4757;
         }
 
-        /* Кнопка удара (размещена поверх наковальни) */
+        /* НОВАЯ КНОПКА (КАРТИНКА) */
         #hammer-btn {
             position: absolute;
-            bottom: 2%; /* Высота кнопки над низом картинки */
+            bottom: 2%; /* Ровно внизу автомата */
             left: 50%;
             transform: translateX(-50%);
-            width: 110px; 
-            height: 110px; 
-            border-radius: 50%;
-            background: radial-gradient(circle, #ff4757 0%, #c0392b 100%);
-            border: 6px solid #f1c40f;
+            width: 85px;  /* Уменьшенный размер */
+            height: 85px; 
+            background-color: transparent;
+            background-image: url('https://i.postimg.cc/fbd6rbjh/11-(11).png');
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            border: none;
             cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Russo One', sans-serif;
-            font-size: 1.4rem;
-            color: white;
-            text-transform: uppercase;
-            box-shadow: 0 10px 0 #8e44ad, 0 15px 20px rgba(0,0,0,0.8);
-            transition: all 0.1s;
+            transition: transform 0.1s;
             z-index: 10;
+            /* Убираем синюю обводку при клике в некоторых браузерах */
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
         }
+        /* Анимация нажатия - кнопка вдавливается вниз */
         #hammer-btn:active { 
-            transform: translate(-50%, 10px); 
-            box-shadow: 0 0 0 #8e44ad, 0 5px 10px rgba(0,0,0,0.8); 
-            background: radial-gradient(circle, #ff6b81 0%, #e74c3c 100%);
+            transform: translate(-50%, 8px) scale(0.95); 
         }
-        #hammer-btn:disabled { filter: grayscale(80%); cursor: not-allowed; }
+        #hammer-btn:disabled { 
+            filter: grayscale(100%); 
+            cursor: not-allowed; 
+        }
 
         /* ПРАВАЯ ПАНЕЛЬ: Вопросы и ответы */
         #right-panel {
@@ -165,9 +163,10 @@
             z-index: 2;
         }
 
+        /* Прогресс-бар */
         #progress-container { width: 100%; background: rgba(0,0,0,0.5); border-radius: 10px; height: 15px; margin-bottom: 20px; border: 2px solid #555; overflow: hidden; }
         #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #f1c40f, #f39c12); transition: width 0.3s ease; }
-        #progress-text { text-align: right; color: #f1c40f; font-weight: bold; font-size: 1.2rem; margin-bottom: 10px; }
+        #progress-text { text-align: right; color: #f1c40f; font-weight: bold; font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase; }
 
         #question-display {
             background-color: rgba(255, 255, 255, 0.95);
@@ -193,7 +192,6 @@
             position: absolute;
             left: 20px;
             width: calc(100% - 80px);
-            /* top и height задаются через JS для идеального совпадения */
         }
 
         .answer-slot {
@@ -210,16 +208,17 @@
             text-align: center;
             transition: all 0.2s;
             box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-            transform: translateY(-50%); /* Центрирует карточку ровно по уровню лазера */
+            transform: translateY(-50%); 
             z-index: 3;
             box-sizing: border-box;
         }
 
-        /* Фидбек и Финал */
+        /* Фидбек (Отлично/Промах) */
         #feedback-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
         #feedback-text { font-family: 'Russo One', sans-serif; font-size: 6rem; text-align: center; text-transform: uppercase; text-shadow: 0 0 20px #000, 4px 4px 0 #000; margin-bottom: 10px; }
         #feedback-points { font-family: 'Russo One', sans-serif; font-size: 4rem; background: rgba(0,0,0,0.8); padding: 10px 40px; border-radius: 20px; border: 4px solid currentColor; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 
+        /* Финальный экран */
         #final-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 30; display: none; text-align: center; }
         #final-screen h2 { font-family: 'Russo One', sans-serif; font-size: 5rem; margin: 0; color: #fff; text-transform: uppercase; text-shadow: 0 0 20px #e94560; }
         #final-score { font-family: 'Russo One', sans-serif; font-size: 8rem; color: #ffd700; margin: 20px 0; text-shadow: 0 0 30px #f39c12; }
@@ -240,12 +239,13 @@
             <div id="track">
                 <div id="slider"><div id="slider-pointer"></div></div>
             </div>
-            <button id="hammer-btn">УДАР!</button>
+            <!-- В кнопке теперь нет текста, только картинка в CSS -->
+            <button id="hammer-btn" aria-label="Удар молотком"></button>
         </div>
     </div>
 
     <div id="right-panel">
-        <div id="progress-text">Вопрос: <span id="progress-num">1</span>/12</div>
+        <div id="progress-text">Вопрос <span id="progress-num">1</span> из 12</div>
         <div id="progress-container"><div id="progress-bar"></div></div>
         
         <div id="question-display">Загрузка...</div>
@@ -266,7 +266,7 @@
 </div>
 
 <script>
-    // ГЕНЕРАТОР ЗВУКОВ
+    // ГЕНЕРАТОР ЗВУКОВ ПО ТЗ (Синтезатор, чтобы браузер не блокировал файлы)
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playSound(type) {
         if(audioCtx.state === 'suspended') audioCtx.resume();
@@ -276,14 +276,14 @@
         gainNode.connect(audioCtx.destination);
         const now = audioCtx.currentTime;
         
-        if (type === 'hit') {
+        if (type === 'hit') { 
             osc.type = 'square';
             osc.frequency.setValueAtTime(150, now);
             osc.frequency.exponentialRampToValueAtTime(0.01, now + 0.1);
             gainNode.gain.setValueAtTime(1, now);
             gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
             osc.start(now); osc.stop(now + 0.1);
-        } else if (type === 'success') {
+        } else if (type === 'success') { 
             osc.type = 'sine';
             osc.frequency.setValueAtTime(440, now);
             osc.frequency.setValueAtTime(554.37, now + 0.1);
@@ -291,7 +291,7 @@
             gainNode.gain.setValueAtTime(0.5, now);
             gainNode.gain.linearRampToValueAtTime(0, now + 0.5);
             osc.start(now); osc.stop(now + 0.5);
-        } else if (type === 'error') {
+        } else if (type === 'error') { 
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(200, now);
             osc.frequency.linearRampToValueAtTime(100, now + 0.4);
@@ -301,7 +301,7 @@
         }
     }
 
-    // КОНФИГУРАЦИЯ
+    // КОНФИГУРАЦИЯ (Очки строго по ТЗ, 12 вопросов, по 3 варианта)
     const gameConfig = {
         sliderSpeedMultiplier: 1.5,
         points: { perfect: 100, good: 70, wrong: -80, miss: -50 },
@@ -322,7 +322,7 @@
         ranks: [
             { minScore: 0, title: "Новичок" },
             { minScore: 500, title: "Эксперт" },
-            { minScore: 1000, title: "Мастер силы!" }
+            { minScore: 1000, title: "Мастер силы!" } 
         ]
     };
 
@@ -351,7 +351,7 @@
         finalRank: document.getElementById('final-rank')
     };
 
-    // Авто-выравнивание ответов под высоту трубы
+    // Авто-выравнивание ответов под высоту трубы автомата
     function alignAnswersContainer() {
         const trackRect = ui.track.getBoundingClientRect();
         const rightPanelRect = document.getElementById('right-panel').getBoundingClientRect();
@@ -373,6 +373,8 @@
         if (currentQuestionIndex >= gameConfig.questions.length) { endGame(); return; }
 
         const qData = gameConfig.questions[currentQuestionIndex];
+        
+        // Обновляем прогресс (12 делений по ТЗ)
         ui.progNum.innerText = currentQuestionIndex + 1;
         ui.progBar.style.width = `${((currentQuestionIndex) / gameConfig.questions.length) * 100}%`;
         ui.question.innerText = qData.text;
@@ -380,7 +382,6 @@
         ui.answersBox.innerHTML = '';
         alignAnswersContainer();
 
-        // Распределяем карточки ровно по высоте шкалы (0%, 50%, 100%)
         qData.options.forEach((opt, index) => {
             const div = document.createElement('div');
             div.className = 'answer-slot';
@@ -411,7 +412,6 @@
         if (laserY >= trackHeight) { laserY = trackHeight; direction = -1; } 
         else if (laserY <= 0) { laserY = 0; direction = 1; }
 
-        // Двигаем так, чтобы ЦЕНТР бегунка (лазер) был на уровне laserY
         ui.slider.style.top = (laserY - (ui.slider.clientHeight / 2)) + 'px';
         animationFrameId = requestAnimationFrame(animateSlider);
     }
@@ -433,19 +433,19 @@
         const trackHeight = ui.track.clientHeight;
         const optsCount = gameConfig.questions[currentQuestionIndex].options.length;
         const slotDistance = trackHeight / (optsCount - 1);
-        const maxDeviation = slotDistance / 2; // Допустимая погрешность (половина расстояния)
+        const maxDeviation = slotDistance / 2; 
 
         let hitIndex = -1;
         let accuracy = 0;
 
-        // Математически вычисляем, в какой ответ ударил лазер
+        // Определяем попадание
         for(let i=0; i<optsCount; i++) {
             const slotCenterY = i * slotDistance;
             const deviation = Math.abs(slotCenterY - laserY);
             
             if (deviation <= maxDeviation) {
                 hitIndex = i;
-                accuracy = 1 - (deviation / maxDeviation); // от 0 до 1
+                accuracy = 1 - (deviation / maxDeviation); 
                 break;
             }
         }
@@ -464,8 +464,9 @@
             slots[hitIndex].style.transform = 'translateY(-50%) scale(1.05)';
         }
 
+        // Логика начисления очков строго по ТЗ
         if (hitIndex === -1) {
-            pointsEarned = gameConfig.points.miss;
+            pointsEarned = gameConfig.points.miss; // -50
             message = "ПОПРОБУЙ ЕЩЁ!";
             color = "#bdc3c7"; 
             playSound('error');
@@ -473,24 +474,24 @@
             slots[hitIndex].style.borderColor = "#2ecc71"; 
             slots[hitIndex].style.backgroundColor = "#e8f8f5";
             playSound('success');
-            fireConfetti();
+            fireConfetti(); 
 
             if (accuracy > 0.6) { 
-                pointsEarned = gameConfig.points.perfect;
+                pointsEarned = gameConfig.points.perfect; // +100 (идеальное время)
                 message = "ИДЕАЛЬНО!";
                 color = "#2ecc71";
             } else { 
-                pointsEarned = gameConfig.points.good;
+                pointsEarned = gameConfig.points.good; // +70 (небольшое опоздание)
                 message = "ОТЛИЧНО!";
                 color = "#f1c40f";
             }
         } else {
             slots[hitIndex].style.borderColor = "#e74c3c"; 
             slots[hitIndex].style.backgroundColor = "#fdedec";
-            pointsEarned = gameConfig.points.wrong;
+            pointsEarned = gameConfig.points.wrong; // -80
             message = "ПОЧТИ!";
             color = "#e74c3c";
-            playSound('error');
+            playSound('error'); 
         }
 
         updateScoreDisplay(pointsEarned);
@@ -502,6 +503,7 @@
         }, 2000); 
     }
 
+    // Обновление счета с анимацией увеличения
     function updateScoreDisplay(points) {
         score += points;
         if(score < 0) score = 0; 
