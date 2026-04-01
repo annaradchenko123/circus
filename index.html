@@ -44,6 +44,59 @@
             z-index: 1;
         }
 
+        /* СТАРТОВОЕ МЕНЮ */
+        #start-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 50; /* Поверх всего */
+            backdrop-filter: blur(5px);
+            transition: opacity 0.3s;
+        }
+        .start-content {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px 60px;
+            border-radius: 30px;
+            text-align: center;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 4px solid #f39c12;
+        }
+        .start-content h2 {
+            font-size: 3rem;
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .start-content p {
+            font-size: 1.5rem;
+            color: #34495e;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        #start-btn {
+            padding: 15px 60px;
+            background-color: #ff7979;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: 'Ubuntu', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 8px 0 #eb4d4b;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+        #start-btn:hover { transform: scale(1.05); }
+        #start-btn:active { transform: translateY(8px); box-shadow: 0 0 0 #eb4d4b; }
+
         /* ЛЕВАЯ ПАНЕЛЬ: Силомер */
         #left-panel {
             width: 35%; 
@@ -64,14 +117,14 @@
             background-repeat: no-repeat;
         }
 
-        /* ПЛАШКА ДЛЯ ОЧКОВ (Увеличена и опущена чуть ниже) */
+        /* ПЛАШКА ДЛЯ ОЧКОВ */
         #score-wrapper {
             position: absolute;
-            top: -3%; /* Опустили вниз (было -8%) */
+            top: -3%; 
             left: 50%;
             transform: translateX(-50%);
-            width: 280px;  /* Увеличили размер (было 240px) */
-            height: 130px; /* Увеличили высоту (было 110px) */
+            width: 280px;  
+            height: 130px; 
             background-image: url('https://i.postimg.cc/RhM2zKxn/11_(14).png');
             background-size: contain;
             background-position: center;
@@ -86,7 +139,7 @@
         #score-display {
             color: #ffd700; 
             font-weight: 900;
-            font-size: 2.8rem; /* Немного увеличили шрифт под новую плашку */
+            font-size: 2.8rem; 
             text-shadow: 0 3px 6px rgba(0,0,0,0.8); 
             transition: transform 0.2s;
             margin-top: -6px; 
@@ -245,6 +298,16 @@
 <div id="game-wrapper">
     <div class="overlay-bg"></div>
 
+    <!-- СТАРТОВОЕ МЕНЮ -->
+    <div id="start-screen">
+        <div class="start-content">
+            <h2>КАК ИГРАТЬ?</h2>
+            <p>Золотой лазер быстро бегает вверх и вниз.</p>
+            <p>Прочитайте вопрос и нажмите кнопку на силомере в тот момент, когда лазер окажется ровно на правильном ответе!</p>
+            <button id="start-btn">НАЧАТЬ!</button>
+        </div>
+    </div>
+
     <div id="left-panel">
         <div id="silomer-machine">
             <!-- Плашка с очками -->
@@ -257,7 +320,7 @@
             </div>
             
             <!-- Кнопка удара -->
-            <button id="hammer-btn" aria-label="Удар молотком"></button>
+            <button id="hammer-btn" aria-label="Удар молотком" disabled></button>
         </div>
     </div>
 
@@ -365,7 +428,9 @@
         fPoints: document.getElementById('feedback-points'),
         finalScreen: document.getElementById('final-screen'),
         finalScore: document.getElementById('final-score'),
-        finalRank: document.getElementById('final-rank')
+        finalRank: document.getElementById('final-rank'),
+        startScreen: document.getElementById('start-screen'),
+        startBtn: document.getElementById('start-btn')
     };
 
     // Привязываем высоту контейнера ответов к шкале
@@ -377,6 +442,16 @@
         ui.answersBox.style.height = trackRect.height + 'px';
     }
     window.addEventListener('resize', alignAnswersContainer);
+
+    // Запуск по кнопке "НАЧАТЬ"
+    ui.startBtn.addEventListener('click', () => {
+        if(audioCtx.state === 'suspended') audioCtx.resume(); // Включаем звук
+        ui.startScreen.style.opacity = '0';
+        setTimeout(() => {
+            ui.startScreen.style.display = 'none';
+            initGame();
+        }, 300);
+    });
 
     function initGame() {
         currentQuestionIndex = 0;
@@ -556,7 +631,9 @@
         setTimeout(fireConfetti, 500);
     }
 
-    initGame();
+    // При первой загрузке мы просто выстраиваем карточки, но не запускаем лазер.
+    // Лазер запустится только после нажатия "НАЧАТЬ!".
+    alignAnswersContainer();
 </script>
 </body>
 </html>
