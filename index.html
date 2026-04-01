@@ -52,7 +52,7 @@
             z-index: 2;
         }
 
-        /* НОВАЯ КАРТИНКА СИЛОМЕРА */
+        /* КАРТИНКА СИЛОМЕРА */
         #silomer-machine {
             position: absolute;
             width: 100%;
@@ -64,56 +64,67 @@
             background-repeat: no-repeat;
         }
 
-        /* Табло счета */
-        #score-display {
+        /* НОВАЯ ПЛАШКА ДЛЯ ОЧКОВ (Картинка) */
+        #score-wrapper {
             position: absolute;
-            top: 2%; 
+            top: 1%; /* Располагаем сверху силомера */
             left: 50%;
             transform: translateX(-50%);
-            background-color: rgba(17, 17, 17, 0.9);
-            color: #ffd700;
-            padding: 5px 25px;
-            border-radius: 12px;
-            font-weight: 900;
-            font-size: 2.8rem;
-            border: 3px solid #ff7979;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            transition: transform 0.2s;
+            width: 180px;  /* Размер картинки-плашки */
+            height: 80px;
+            background-image: url('https://i.postimg.cc/RhM2zKxn/11_(14).png');
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             z-index: 10;
         }
-        .score-anim { transform: translate(-50%, 0) scale(1.15) !important; color: #fff !important; }
 
-        /* НАСТРОЙКА ШКАЛЫ (Опущена ниже, чтобы освободить верх) */
+        /* Сами цифры очков внутри плашки */
+        #score-display {
+            color: #ffd700; /* Золотой цвет */
+            font-weight: 900;
+            font-size: 2.8rem;
+            text-shadow: 0 3px 5px rgba(0,0,0,0.8); /* Легкая тень для объема */
+            transition: transform 0.2s;
+            margin-top: -5px; /* Легкая корректировка по центру картинки */
+        }
+        /* Анимация увеличения цифр (плашка не дергается) */
+        .score-anim { transform: scale(1.3); color: #fff !important; }
+
+        /* НАСТРОЙКА ШКАЛЫ */
         #track {
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            top: 30%;      /* Опустили начало шкалы */
-            height: 48%;   /* Длина шкалы */
+            top: 30%;      
+            height: 48%;   
             width: 10px;
-            background: rgba(255, 255, 255, 0.05); /* Невидимая направляющая */
+            background: rgba(255, 255, 255, 0.05); 
             z-index: 5;
         }
 
-        /* Менее агрессивный и уменьшенный ползунок */
+        /* Ползунок */
         #slider {
             position: absolute;
-            width: 50px;       /* Уменьшили ширину */
-            left: -20px;       /* Центрируем */
-            height: 24px;      /* Уменьшили высоту */
-            background: linear-gradient(90deg, #ff7979, #ff9e9e); /* Мягкий коралловый цвет */
+            width: 50px;       
+            left: -20px;       
+            height: 24px;      
+            background: linear-gradient(90deg, #ff7979, #ff9e9e); 
             border-radius: 12px;
             border: 2px solid white;
-            box-shadow: 0 0 10px rgba(255, 121, 121, 0.6); /* Мягкое свечение */
+            box-shadow: 0 0 10px rgba(255, 121, 121, 0.6); 
             z-index: 6;
         }
 
-        /* Менее яркий лазер */
+        /* Лазер */
         #slider-pointer {
             position: absolute;
             width: 1000px;
-            height: 3px; /* Сделали тоньше */
-            background: linear-gradient(90deg, rgba(255, 121, 121, 0.6) 0%, rgba(255, 121, 121, 0) 100%); /* Полупрозрачный, не режет глаз */
+            height: 3px; 
+            background: linear-gradient(90deg, rgba(255, 121, 121, 0.6) 0%, rgba(255, 121, 121, 0) 100%); 
             top: 50%;
             left: 100%;
             transform: translateY(-50%);
@@ -121,16 +132,16 @@
             z-index: 1;
         }
 
-        /* Кнопка (Картинка) */
+        /* НОВАЯ КНОПКА (Уменьшена и поднята выше) */
         #hammer-btn {
             position: absolute;
-            bottom: -8%; 
+            bottom: 12%; /* ПОДНЯЛИ ВЫШЕ, чтобы закрыть нарисованную кнопку */
             left: 50%;
             transform: translateX(-50%);
-            width: 160px;  
-            height: 140px; 
+            width: 110px;  /* УМЕНЬШИЛИ НА ТРЕТЬ (было 160) */
+            height: 110px; 
             background-color: transparent;
-            background-image: url('https://i.postimg.cc/Y0LnhnXX/11-(12).png');
+            background-image: url('https://i.postimg.cc/wM6ndL8Z/11_(13).png');
             background-size: contain;
             background-position: center;
             background-repeat: no-repeat;
@@ -141,7 +152,9 @@
             outline: none;
             -webkit-tap-highlight-color: transparent;
         }
-        #hammer-btn:active { transform: translate(-50%, 10px) scale(0.95); }
+        /* Анимация вдавливания */
+        #hammer-btn:active { transform: translate(-50%, 8px) scale(0.95); }
+        /* ЧБ эффект */
         #hammer-btn:disabled { filter: grayscale(100%); cursor: not-allowed; opacity: 0.8; }
 
         /* ПРАВАЯ ПАНЕЛЬ */
@@ -187,13 +200,13 @@
             width: calc(100% - 80px);
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* Распределяет 3 ответа равномерно */
+            justify-content: space-between; 
         }
 
         .answer-slot {
             width: 100%;
             background-color: rgba(255, 255, 255, 0.95);
-            border: 3px solid #cbd5e1; /* Мягкая рамка */
+            border: 3px solid #cbd5e1; 
             color: #1e293b;
             padding: 20px;
             font-size: 1.6rem;
@@ -208,23 +221,8 @@
 
         /* ФИДБЕК */
         #feedback-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
-        #feedback-text { 
-            font-size: 5rem; 
-            font-weight: 900; 
-            text-align: center; 
-            text-transform: uppercase; 
-            text-shadow: 0 4px 15px rgba(0,0,0,0.4); 
-            margin-bottom: 15px; 
-            letter-spacing: 2px;
-        }
-        #feedback-points { 
-            font-size: 3.5rem; 
-            font-weight: 700; 
-            background: rgba(255, 255, 255, 0.95); 
-            padding: 10px 40px; 
-            border-radius: 30px; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2); 
-        }
+        #feedback-text { font-size: 5rem; font-weight: 900; text-align: center; text-transform: uppercase; text-shadow: 0 4px 15px rgba(0,0,0,0.4); margin-bottom: 15px; letter-spacing: 2px; }
+        #feedback-points { font-size: 3.5rem; font-weight: 700; background: rgba(255, 255, 255, 0.95); padding: 10px 40px; border-radius: 30px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
 
         /* Финальный экран */
         #final-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 30; display: none; text-align: center; backdrop-filter: blur(5px); }
@@ -243,10 +241,16 @@
 
     <div id="left-panel">
         <div id="silomer-machine">
-            <div id="score-display">0</div>
+            <!-- Плашка с очками -->
+            <div id="score-wrapper">
+                <div id="score-display">0</div>
+            </div>
+            
             <div id="track">
                 <div id="slider"><div id="slider-pointer"></div></div>
             </div>
+            
+            <!-- Кнопка поверх рисунка -->
             <button id="hammer-btn" aria-label="Удар молотком"></button>
         </div>
     </div>
@@ -358,7 +362,7 @@
         finalRank: document.getElementById('final-rank')
     };
 
-    // Функция, которая делает высоту 3-х ответов точно такой же, как длина трубы силомера
+    // Привязываем высоту контейнера ответов к шкале
     function alignAnswersContainer() {
         const trackRect = ui.track.getBoundingClientRect();
         const rightPanelRect = document.getElementById('right-panel').getBoundingClientRect();
@@ -434,7 +438,6 @@
     ui.btn.addEventListener('mousedown', handleHit);
     ui.btn.addEventListener('touchstart', handleHit);
 
-    // Проверка попадания: Абсолютные координаты лазера сравниваются с краями карточек
     function checkHit() {
         const trackRect = ui.track.getBoundingClientRect();
         const hitLineAbsoluteY = trackRect.top + laserY; 
@@ -445,7 +448,6 @@
 
         slots.forEach((slot, index) => {
             const rect = slot.getBoundingClientRect();
-            // Попадание засчитывается, если лазер находится от верхнего до нижнего края карточки
             if (hitLineAbsoluteY >= rect.top && hitLineAbsoluteY <= rect.bottom) {
                 hitIndex = index;
                 const slotCenter = rect.top + (rect.height / 2);
