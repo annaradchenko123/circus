@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Игра: Силомер</title>
-    <!-- Подключаем библиотеку для салюта/хлопушки -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Russo+One&family=Ubuntu:wght@400;700&display=swap');
+        /* Оставили только мягкий и аккуратный шрифт Ubuntu */
+        @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700;900&display=swap');
 
         body { 
             font-family: 'Ubuntu', sans-serif; 
@@ -21,7 +21,6 @@
             user-select: none;
         }
         
-        /* Главный контейнер 16:9 с фоном цирка */
         #game-wrapper {
             width: 100%;
             max-width: 1280px; 
@@ -39,7 +38,7 @@
         .overlay-bg {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(90deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.4) 100%);
+            background: linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%);
             z-index: 1;
         }
 
@@ -51,43 +50,43 @@
             z-index: 2;
         }
 
-        /* Контейнер с вашей картинкой силомера */
+        /* Подняли автомат выше (bottom: 12%) */
         #silomer-machine {
             position: absolute;
             width: 100%;
-            height: 90%;
-            bottom: 5%;
+            height: 85%;
+            bottom: 12%; 
             background-image: url('https://i.postimg.cc/L5YGK6LG/11-(10).png');
             background-size: contain;
             background-position: center bottom;
             background-repeat: no-repeat;
         }
 
-        /* Табло счета на автомате */
+        /* Табло счета поднято выше (top: 5%) */
         #score-display {
             position: absolute;
-            top: 13%; 
+            top: 5%; 
             left: 50%;
             transform: translateX(-50%);
             background-color: #111;
             color: #ffd700;
-            padding: 10px 25px;
-            border-radius: 10px;
-            font-family: 'Russo One', sans-serif;
+            padding: 8px 30px;
+            border-radius: 15px;
+            font-weight: 900;
             font-size: 3rem;
             border: 4px solid #ff4757;
-            box-shadow: 0 0 20px rgba(255, 71, 87, 0.8), inset 0 0 10px #000;
+            box-shadow: 0 0 15px rgba(255, 71, 87, 0.6), inset 0 0 10px #000;
             transition: transform 0.2s;
             z-index: 10;
         }
-        .score-anim { transform: translate(-50%, 0) scale(1.3) !important; color: #fff !important; }
+        .score-anim { transform: translate(-50%, 0) scale(1.2) !important; color: #fff !important; }
 
-        /* НАСТРОЙКА ШКАЛЫ (Невидимая труба для бегунка) */
+        /* НАСТРОЙКА ШКАЛЫ */
         #track {
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            top: 26%;      
+            top: 25%;      
             height: 50%;   
             width: 10px;
             background: rgba(255, 255, 255, 0.05); 
@@ -103,34 +102,32 @@
             background: linear-gradient(90deg, #ff4757, #ff6b81);
             border-radius: 17px;
             border: 3px solid white;
-            box-shadow: 0 0 20px #ff4757;
+            box-shadow: 0 0 15px #ff4757;
             z-index: 6;
         }
 
-        /* Лазерный луч вправо */
         #slider-pointer {
             position: absolute;
             width: 1000px;
             height: 4px;
-            background: linear-gradient(90deg, rgba(255, 71, 87, 1) 0%, rgba(255, 71, 87, 0) 100%);
+            background: linear-gradient(90deg, rgba(255, 71, 87, 0.9) 0%, rgba(255, 71, 87, 0) 100%);
             top: 50%;
             left: 100%;
             transform: translateY(-50%);
             pointer-events: none;
             z-index: 1;
-            box-shadow: 0 0 10px #ff4757;
         }
 
-        /* НОВАЯ КНОПКА (КАРТИНКА) */
+        /* НОВАЯ КНОПКА (Больше размером, опущена на самое основание) */
         #hammer-btn {
             position: absolute;
-            bottom: 2%; /* Ровно внизу автомата */
+            bottom: -8%; /* Опущена вниз силомера */
             left: 50%;
             transform: translateX(-50%);
-            width: 85px;  /* Уменьшенный размер */
-            height: 85px; 
+            width: 150px;  /* Сделали заметно крупнее */
+            height: 130px; 
             background-color: transparent;
-            background-image: url('https://i.postimg.cc/fbd6rbjh/11-(11).png');
+            background-image: url('https://i.postimg.cc/Y0LnhnXX/11-(12).png');
             background-size: contain;
             background-position: center;
             background-repeat: no-repeat;
@@ -138,20 +135,19 @@
             cursor: pointer;
             transition: transform 0.1s;
             z-index: 10;
-            /* Убираем синюю обводку при клике в некоторых браузерах */
             outline: none;
             -webkit-tap-highlight-color: transparent;
         }
-        /* Анимация нажатия - кнопка вдавливается вниз */
         #hammer-btn:active { 
-            transform: translate(-50%, 8px) scale(0.95); 
+            transform: translate(-50%, 10px) scale(0.95); 
         }
         #hammer-btn:disabled { 
             filter: grayscale(100%); 
             cursor: not-allowed; 
+            opacity: 0.8;
         }
 
-        /* ПРАВАЯ ПАНЕЛЬ: Вопросы и ответы */
+        /* ПРАВАЯ ПАНЕЛЬ */
         #right-panel {
             width: 65%;
             height: 100%;
@@ -163,10 +159,9 @@
             z-index: 2;
         }
 
-        /* Прогресс-бар */
-        #progress-container { width: 100%; background: rgba(0,0,0,0.5); border-radius: 10px; height: 15px; margin-bottom: 20px; border: 2px solid #555; overflow: hidden; }
+        #progress-container { width: 100%; background: rgba(0,0,0,0.5); border-radius: 10px; height: 12px; margin-bottom: 20px; border: 2px solid #555; overflow: hidden; }
         #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #f1c40f, #f39c12); transition: width 0.3s ease; }
-        #progress-text { text-align: right; color: #f1c40f; font-weight: bold; font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase; }
+        #progress-text { text-align: right; color: #f1c40f; font-weight: 700; font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
 
         #question-display {
             background-color: rgba(255, 255, 255, 0.95);
@@ -176,8 +171,8 @@
             font-size: 2rem;
             font-weight: 700;
             text-align: center;
-            border: 6px solid #f39c12;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            border: 4px solid #f39c12;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
             margin-bottom: 20px;
             min-height: 110px;
             display: flex;
@@ -187,7 +182,6 @@
             z-index: 10;
         }
 
-        /* Контейнер ответов привязан к высоте шкалы слева */
         #answers-container {
             position: absolute;
             left: 20px;
@@ -198,34 +192,49 @@
             position: absolute;
             width: 100%;
             left: 0;
-            background-color: rgba(255, 255, 255, 0.9);
-            border: 4px solid #34495e;
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 3px solid #34495e;
             color: #2c3e50;
             padding: 20px;
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: 700;
             border-radius: 15px;
             text-align: center;
             transition: all 0.2s;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             transform: translateY(-50%); 
             z-index: 3;
             box-sizing: border-box;
         }
 
-        /* Фидбек (Отлично/Промах) */
+        /* МЯГКИЙ ФИДБЕК (Отлично/Промах) */
         #feedback-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
-        #feedback-text { font-family: 'Russo One', sans-serif; font-size: 6rem; text-align: center; text-transform: uppercase; text-shadow: 0 0 20px #000, 4px 4px 0 #000; margin-bottom: 10px; }
-        #feedback-points { font-family: 'Russo One', sans-serif; font-size: 4rem; background: rgba(0,0,0,0.8); padding: 10px 40px; border-radius: 20px; border: 4px solid currentColor; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        #feedback-text { 
+            font-size: 5rem; 
+            font-weight: 900; 
+            text-align: center; 
+            text-transform: uppercase; 
+            text-shadow: 0 4px 15px rgba(0,0,0,0.4); /* Мягкая тень вместо черной обводки */
+            margin-bottom: 15px; 
+            letter-spacing: 2px;
+        }
+        #feedback-points { 
+            font-size: 3.5rem; 
+            font-weight: 700; 
+            background: rgba(255, 255, 255, 0.95); /* Светлая плашка для очков */
+            padding: 10px 40px; 
+            border-radius: 30px; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); 
+        }
 
         /* Финальный экран */
-        #final-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 30; display: none; text-align: center; }
-        #final-screen h2 { font-family: 'Russo One', sans-serif; font-size: 5rem; margin: 0; color: #fff; text-transform: uppercase; text-shadow: 0 0 20px #e94560; }
-        #final-score { font-family: 'Russo One', sans-serif; font-size: 8rem; color: #ffd700; margin: 20px 0; text-shadow: 0 0 30px #f39c12; }
-        #final-rank { color: #2ecc71; font-size: 3.5rem; text-transform: uppercase; font-weight: bold; margin-bottom: 40px;}
-        .restart-btn { padding: 20px 60px; background-color: #e94560; color: white; border: 6px solid #fff; border-radius: 30px; font-family: 'Russo One', sans-serif; font-size: 2.5rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 10px 0 #c0392b; text-transform: uppercase; }
+        #final-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 30; display: none; text-align: center; backdrop-filter: blur(5px); }
+        #final-screen h2 { font-size: 4rem; font-weight: 900; margin: 0; color: #fff; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 5px 15px rgba(233, 69, 96, 0.5); }
+        #final-score { font-size: 7rem; font-weight: 900; color: #ffd700; margin: 10px 0; text-shadow: 0 5px 20px rgba(243, 156, 18, 0.5); }
+        #final-rank { color: #2ecc71; font-size: 3rem; text-transform: uppercase; font-weight: 700; margin-bottom: 40px;}
+        .restart-btn { padding: 20px 60px; background-color: #e94560; color: white; border: none; border-radius: 40px; font-size: 2rem; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 8px 0 #c0392b, 0 15px 20px rgba(0,0,0,0.3); text-transform: uppercase; }
         .restart-btn:hover { transform: scale(1.05); }
-        .restart-btn:active { transform: translateY(10px); box-shadow: 0 0 0 #c0392b; }
+        .restart-btn:active { transform: translateY(8px); box-shadow: 0 0 0 #c0392b; }
     </style>
 </head>
 <body>
@@ -239,7 +248,7 @@
             <div id="track">
                 <div id="slider"><div id="slider-pointer"></div></div>
             </div>
-            <!-- В кнопке теперь нет текста, только картинка в CSS -->
+            <!-- Новая кнопка на основании -->
             <button id="hammer-btn" aria-label="Удар молотком"></button>
         </div>
     </div>
@@ -266,7 +275,7 @@
 </div>
 
 <script>
-    // ГЕНЕРАТОР ЗВУКОВ ПО ТЗ (Синтезатор, чтобы браузер не блокировал файлы)
+    // ГЕНЕРАТОР ЗВУКОВ
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playSound(type) {
         if(audioCtx.state === 'suspended') audioCtx.resume();
@@ -301,7 +310,7 @@
         }
     }
 
-    // КОНФИГУРАЦИЯ (Очки строго по ТЗ, 12 вопросов, по 3 варианта)
+    // КОНФИГУРАЦИЯ (Ровно 3 варианта ответа)
     const gameConfig = {
         sliderSpeedMultiplier: 1.5,
         points: { perfect: 100, good: 70, wrong: -80, miss: -50 },
@@ -351,7 +360,6 @@
         finalRank: document.getElementById('final-rank')
     };
 
-    // Авто-выравнивание ответов под высоту трубы автомата
     function alignAnswersContainer() {
         const trackRect = ui.track.getBoundingClientRect();
         const rightPanelRect = document.getElementById('right-panel').getBoundingClientRect();
@@ -374,7 +382,6 @@
 
         const qData = gameConfig.questions[currentQuestionIndex];
         
-        // Обновляем прогресс (12 делений по ТЗ)
         ui.progNum.innerText = currentQuestionIndex + 1;
         ui.progBar.style.width = `${((currentQuestionIndex) / gameConfig.questions.length) * 100}%`;
         ui.question.innerText = qData.text;
@@ -382,11 +389,13 @@
         ui.answersBox.innerHTML = '';
         alignAnswersContainer();
 
+        // Всегда строго 3 карточки ответа
         qData.options.forEach((opt, index) => {
             const div = document.createElement('div');
             div.className = 'answer-slot';
             div.innerText = opt;
             div.dataset.index = index;
+            // 0%, 50%, 100% для трех карточек
             div.style.top = (index * (100 / (qData.options.length - 1))) + '%';
             ui.answersBox.appendChild(div);
         });
@@ -433,12 +442,11 @@
         const trackHeight = ui.track.clientHeight;
         const optsCount = gameConfig.questions[currentQuestionIndex].options.length;
         const slotDistance = trackHeight / (optsCount - 1);
-        const maxDeviation = slotDistance / 2; 
+        const maxDeviation = slotDistance / 2.2; // Чуть строже окно попадания
 
         let hitIndex = -1;
         let accuracy = 0;
 
-        // Определяем попадание
         for(let i=0; i<optsCount; i++) {
             const slotCenterY = i * slotDistance;
             const deviation = Math.abs(slotCenterY - laserY);
@@ -464,9 +472,8 @@
             slots[hitIndex].style.transform = 'translateY(-50%) scale(1.05)';
         }
 
-        // Логика начисления очков строго по ТЗ
         if (hitIndex === -1) {
-            pointsEarned = gameConfig.points.miss; // -50
+            pointsEarned = gameConfig.points.miss;
             message = "ПОПРОБУЙ ЕЩЁ!";
             color = "#bdc3c7"; 
             playSound('error');
@@ -477,18 +484,18 @@
             fireConfetti(); 
 
             if (accuracy > 0.6) { 
-                pointsEarned = gameConfig.points.perfect; // +100 (идеальное время)
+                pointsEarned = gameConfig.points.perfect;
                 message = "ИДЕАЛЬНО!";
                 color = "#2ecc71";
             } else { 
-                pointsEarned = gameConfig.points.good; // +70 (небольшое опоздание)
+                pointsEarned = gameConfig.points.good;
                 message = "ОТЛИЧНО!";
                 color = "#f1c40f";
             }
         } else {
             slots[hitIndex].style.borderColor = "#e74c3c"; 
             slots[hitIndex].style.backgroundColor = "#fdedec";
-            pointsEarned = gameConfig.points.wrong; // -80
+            pointsEarned = gameConfig.points.wrong;
             message = "ПОЧТИ!";
             color = "#e74c3c";
             playSound('error'); 
@@ -503,7 +510,6 @@
         }, 2000); 
     }
 
-    // Обновление счета с анимацией увеличения
     function updateScoreDisplay(points) {
         score += points;
         if(score < 0) score = 0; 
@@ -517,11 +523,12 @@
     function showFeedback(msg, points, color) {
         ui.fText.innerText = msg;
         ui.fText.style.color = color;
+        // Очки теперь на светлой плашке, а цвет применяется к самому тексту
         ui.fPoints.innerText = points > 0 ? `+${points}` : points;
         ui.fPoints.style.color = color;
-        ui.fPoints.style.borderColor = color;
+        
         ui.feedback.style.opacity = '1';
-        ui.feedback.style.backdropFilter = 'blur(4px)';
+        ui.feedback.style.backdropFilter = 'blur(3px)';
     }
 
     function fireConfetti() {
