@@ -6,7 +6,7 @@
     <title>Игра: Силомер</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        /* Оставили только мягкий и аккуратный шрифт Ubuntu */
+        /* Мягкий и аккуратный шрифт Ubuntu */
         @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700;900&display=swap');
 
         body { 
@@ -50,22 +50,22 @@
             z-index: 2;
         }
 
-        /* Подняли автомат выше (bottom: 12%) */
+        /* Силомер немного опущен */
         #silomer-machine {
             position: absolute;
             width: 100%;
-            height: 85%;
-            bottom: 12%; 
+            height: 80%; /* Сделали чуть компактнее, чтобы опустить */
+            bottom: 6%;  /* Опустили ниже */
             background-image: url('https://i.postimg.cc/L5YGK6LG/11-(10).png');
             background-size: contain;
             background-position: center bottom;
             background-repeat: no-repeat;
         }
 
-        /* Табло счета поднято выше (top: 5%) */
+        /* Табло счета поднято на самый верх */
         #score-display {
             position: absolute;
-            top: 5%; 
+            top: -2%; 
             left: 50%;
             transform: translateX(-50%);
             background-color: #111;
@@ -81,13 +81,13 @@
         }
         .score-anim { transform: translate(-50%, 0) scale(1.2) !important; color: #fff !important; }
 
-        /* НАСТРОЙКА ШКАЛЫ */
+        /* НАСТРОЙКА ШКАЛЫ (Бегает от верхнего до нижнего ответа) */
         #track {
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
             top: 25%;      
-            height: 50%;   
+            height: 52%;   
             width: 10px;
             background: rgba(255, 255, 255, 0.05); 
             z-index: 5;
@@ -118,14 +118,14 @@
             z-index: 1;
         }
 
-        /* НОВАЯ КНОПКА (Больше размером, опущена на самое основание) */
+        /* НОВАЯ КНОПКА (Увеличена и опущена на самое основание) */
         #hammer-btn {
             position: absolute;
-            bottom: -8%; /* Опущена вниз силомера */
+            bottom: -12%; /* Опущена на самое дно */
             left: 50%;
             transform: translateX(-50%);
-            width: 150px;  /* Сделали заметно крупнее */
-            height: 130px; 
+            width: 180px;  /* Заметно увеличена */
+            height: 150px; 
             background-color: transparent;
             background-image: url('https://i.postimg.cc/Y0LnhnXX/11-(12).png');
             background-size: contain;
@@ -138,9 +138,11 @@
             outline: none;
             -webkit-tap-highlight-color: transparent;
         }
+        /* Эффект вдавливания при клике */
         #hammer-btn:active { 
-            transform: translate(-50%, 10px) scale(0.95); 
+            transform: translate(-50%, 12px) scale(0.95); 
         }
+        /* Черно-белый эффект после клика */
         #hammer-btn:disabled { 
             filter: grayscale(100%); 
             cursor: not-allowed; 
@@ -159,9 +161,9 @@
             z-index: 2;
         }
 
-        #progress-container { width: 100%; background: rgba(0,0,0,0.5); border-radius: 10px; height: 12px; margin-bottom: 20px; border: 2px solid #555; overflow: hidden; }
+        #progress-container { width: 100%; background: rgba(0,0,0,0.5); border-radius: 10px; height: 12px; margin-bottom: 20px; border: 2px solid #555; overflow: hidden; flex-shrink: 0; }
         #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #f1c40f, #f39c12); transition: width 0.3s ease; }
-        #progress-text { text-align: right; color: #f1c40f; font-weight: 700; font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        #progress-text { text-align: right; color: #f1c40f; font-weight: 700; font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0; }
 
         #question-display {
             background-color: rgba(255, 255, 255, 0.95);
@@ -173,55 +175,57 @@
             text-align: center;
             border: 4px solid #f39c12;
             box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             min-height: 110px;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
             z-index: 10;
+            flex-shrink: 0;
         }
 
+        /* НОВЫЙ КОНТЕЙНЕР ОТВЕТОВ: Flexbox гарантирует 3 ровных карточки */
         #answers-container {
             position: absolute;
             left: 20px;
             width: calc(100% - 80px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Распределяет карточки от верха до низа */
         }
 
         .answer-slot {
-            position: absolute;
             width: 100%;
-            left: 0;
             background-color: rgba(255, 255, 255, 0.95);
             border: 3px solid #34495e;
             color: #2c3e50;
             padding: 20px;
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             font-weight: 700;
             border-radius: 15px;
             text-align: center;
             transition: all 0.2s;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            transform: translateY(-50%); 
             z-index: 3;
             box-sizing: border-box;
         }
 
-        /* МЯГКИЙ ФИДБЕК (Отлично/Промах) */
+        /* МЯГКИЙ ФИДБЕК */
         #feedback-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
         #feedback-text { 
             font-size: 5rem; 
             font-weight: 900; 
             text-align: center; 
             text-transform: uppercase; 
-            text-shadow: 0 4px 15px rgba(0,0,0,0.4); /* Мягкая тень вместо черной обводки */
+            text-shadow: 0 4px 15px rgba(0,0,0,0.4); 
             margin-bottom: 15px; 
             letter-spacing: 2px;
         }
         #feedback-points { 
             font-size: 3.5rem; 
             font-weight: 700; 
-            background: rgba(255, 255, 255, 0.95); /* Светлая плашка для очков */
+            background: rgba(255, 255, 255, 0.95); 
             padding: 10px 40px; 
             border-radius: 30px; 
             box-shadow: 0 10px 20px rgba(0,0,0,0.2); 
@@ -248,7 +252,7 @@
             <div id="track">
                 <div id="slider"><div id="slider-pointer"></div></div>
             </div>
-            <!-- Новая кнопка на основании -->
+            <!-- Новая крупная кнопка на основании -->
             <button id="hammer-btn" aria-label="Удар молотком"></button>
         </div>
     </div>
@@ -258,6 +262,7 @@
         <div id="progress-container"><div id="progress-bar"></div></div>
         
         <div id="question-display">Загрузка...</div>
+        <!-- Контейнер для строго трех ответов -->
         <div id="answers-container"></div>
     </div>
 
@@ -275,7 +280,6 @@
 </div>
 
 <script>
-    // ГЕНЕРАТОР ЗВУКОВ
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playSound(type) {
         if(audioCtx.state === 'suspended') audioCtx.resume();
@@ -310,7 +314,7 @@
         }
     }
 
-    // КОНФИГУРАЦИЯ (Ровно 3 варианта ответа)
+    // 12 вопросов, строго по 3 варианта ответа
     const gameConfig = {
         sliderSpeedMultiplier: 1.5,
         points: { perfect: 100, good: 70, wrong: -80, miss: -50 },
@@ -360,6 +364,7 @@
         finalRank: document.getElementById('final-rank')
     };
 
+    // Привязываем высоту контейнера ответов строго к высоте трубы силомера
     function alignAnswersContainer() {
         const trackRect = ui.track.getBoundingClientRect();
         const rightPanelRect = document.getElementById('right-panel').getBoundingClientRect();
@@ -389,14 +394,12 @@
         ui.answersBox.innerHTML = '';
         alignAnswersContainer();
 
-        // Всегда строго 3 карточки ответа
+        // Flexbox автоматически распределит эти 3 карточки от верха до низа
         qData.options.forEach((opt, index) => {
             const div = document.createElement('div');
             div.className = 'answer-slot';
             div.innerText = opt;
             div.dataset.index = index;
-            // 0%, 50%, 100% для трех карточек
-            div.style.top = (index * (100 / (qData.options.length - 1))) + '%';
             ui.answersBox.appendChild(div);
         });
 
@@ -438,25 +441,26 @@
     ui.btn.addEventListener('mousedown', handleHit);
     ui.btn.addEventListener('touchstart', handleHit);
 
+    // Логика точного определения попадания по координатам карточек
     function checkHit() {
-        const trackHeight = ui.track.clientHeight;
-        const optsCount = gameConfig.questions[currentQuestionIndex].options.length;
-        const slotDistance = trackHeight / (optsCount - 1);
-        const maxDeviation = slotDistance / 2.2; // Чуть строже окно попадания
-
+        const trackRect = ui.track.getBoundingClientRect();
+        const hitLineAbsoluteY = trackRect.top + laserY; 
+        
+        const slots = document.querySelectorAll('.answer-slot');
         let hitIndex = -1;
         let accuracy = 0;
 
-        for(let i=0; i<optsCount; i++) {
-            const slotCenterY = i * slotDistance;
-            const deviation = Math.abs(slotCenterY - laserY);
-            
-            if (deviation <= maxDeviation) {
-                hitIndex = i;
+        slots.forEach((slot, index) => {
+            const rect = slot.getBoundingClientRect();
+            // Проверяем, находится ли лазер внутри границ карточки
+            if (hitLineAbsoluteY >= rect.top && hitLineAbsoluteY <= rect.bottom) {
+                hitIndex = index;
+                const slotCenter = rect.top + (rect.height / 2);
+                const maxDeviation = rect.height / 2;
+                const deviation = Math.abs(slotCenter - hitLineAbsoluteY);
                 accuracy = 1 - (deviation / maxDeviation); 
-                break;
             }
-        }
+        });
 
         processResult(hitIndex, accuracy);
     }
@@ -469,7 +473,7 @@
 
         const slots = document.querySelectorAll('.answer-slot');
         if (hitIndex !== -1) {
-            slots[hitIndex].style.transform = 'translateY(-50%) scale(1.05)';
+            slots[hitIndex].style.transform = 'scale(1.05)';
         }
 
         if (hitIndex === -1) {
@@ -523,7 +527,6 @@
     function showFeedback(msg, points, color) {
         ui.fText.innerText = msg;
         ui.fText.style.color = color;
-        // Очки теперь на светлой плашке, а цвет применяется к самому тексту
         ui.fPoints.innerText = points > 0 ? `+${points}` : points;
         ui.fPoints.style.color = color;
         
