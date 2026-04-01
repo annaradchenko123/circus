@@ -52,7 +52,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 50; /* Поверх всего */
+            z-index: 50; 
             backdrop-filter: blur(5px);
             transition: opacity 0.3s;
         }
@@ -117,14 +117,32 @@
             background-repeat: no-repeat;
         }
 
+        /* АНИМАЦИЯ ТРЯСКИ ЭКРАНА ПРИ УДАРЕ */
+        @keyframes shake {
+            0% { transform: translate(2px, 2px) rotate(0deg); }
+            10% { transform: translate(-2px, -3px) rotate(-1deg); }
+            20% { transform: translate(-4px, 0px) rotate(1deg); }
+            30% { transform: translate(4px, 3px) rotate(0deg); }
+            40% { transform: translate(2px, -2px) rotate(1deg); }
+            50% { transform: translate(-2px, 3px) rotate(-1deg); }
+            60% { transform: translate(-4px, 1px) rotate(0deg); }
+            70% { transform: translate(4px, 2px) rotate(-1deg); }
+            80% { transform: translate(-2px, -2px) rotate(1deg); }
+            90% { transform: translate(2px, 3px) rotate(0deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+        .shake-effect {
+            animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
         /* ПЛАШКА ДЛЯ ОЧКОВ */
         #score-wrapper {
             position: absolute;
-            top: -3%; 
+            top: -8%; 
             left: 50%;
             transform: translateX(-50%);
-            width: 280px;  
-            height: 130px; 
+            width: 240px;  
+            height: 110px; 
             background-image: url('https://i.postimg.cc/RhM2zKxn/11_(14).png');
             background-size: contain;
             background-position: center;
@@ -139,10 +157,10 @@
         #score-display {
             color: #ffd700; 
             font-weight: 900;
-            font-size: 2.8rem; 
+            font-size: 2.4rem; 
             text-shadow: 0 3px 6px rgba(0,0,0,0.8); 
             transition: transform 0.2s;
-            margin-top: -6px; 
+            margin-top: -5px; 
         }
         .score-anim { transform: scale(1.3); color: #fff !important; }
 
@@ -158,7 +176,7 @@
             z-index: 5;
         }
 
-        /* КРУГЛЫЙ МИНИАТЮРНЫЙ КУРСОР (#ffd700) */
+        /* КРУГЛЫЙ МИНИАТЮРНЫЙ КУРСОР */
         #slider {
             position: absolute;
             box-sizing: border-box;
@@ -172,7 +190,7 @@
             z-index: 6;
         }
 
-        /* ЛАЗЕР (#ffd700) */
+        /* ЛАЗЕР */
         #slider-pointer {
             position: absolute;
             width: 1000px;
@@ -205,7 +223,8 @@
             outline: none;
             -webkit-tap-highlight-color: transparent;
         }
-        #hammer-btn:active { transform: translate(-50%, 8px) scale(0.95); }
+        /* Вдавливание при клике МЫШКОЙ или ПРОБЕЛОМ (.pressed) */
+        #hammer-btn:active, #hammer-btn.pressed { transform: translate(-50%, 8px) scale(0.95); }
         #hammer-btn:disabled { filter: grayscale(100%); cursor: not-allowed; opacity: 0.8; }
 
         /* ПРАВАЯ ПАНЕЛЬ */
@@ -295,6 +314,12 @@
 </head>
 <body>
 
+<!-- АУДИО ФОНОВОЙ МУЗЫКИ -->
+<!-- Вы можете поменять ссылку внутри src="" на свою музыку .mp3, если захотите -->
+<audio id="bg-music" loop>
+    <source src="https://upload.wikimedia.org/wikipedia/commons/e/eb/The_Entertainer_-_Scott_Joplin.ogg" type="audio/ogg">
+</audio>
+
 <div id="game-wrapper">
     <div class="overlay-bg"></div>
 
@@ -303,7 +328,7 @@
         <div class="start-content">
             <h2>КАК ИГРАТЬ?</h2>
             <p>Золотой лазер быстро бегает вверх и вниз.</p>
-            <p>Прочитайте вопрос и нажмите кнопку на силомере в тот момент, когда лазер окажется ровно на правильном ответе!</p>
+            <p>Прочитайте вопрос и нажмите на кнопку (ИЛИ на <b>ПРОБЕЛ</b> на клавиатуре) в тот момент, когда лазер окажется ровно на правильном ответе!</p>
             <button id="start-btn">НАЧАТЬ!</button>
         </div>
     </div>
@@ -346,8 +371,11 @@
 </div>
 
 <script>
-    // ЗВУКИ
+    // НАСТРОЙКА АУДИО И МУЗЫКИ
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const bgMusic = document.getElementById('bg-music');
+    bgMusic.volume = 0.2; // Громкость фона (20%)
+
     function playSound(type) {
         if(audioCtx.state === 'suspended') audioCtx.resume();
         const osc = audioCtx.createOscillator();
@@ -356,6 +384,9 @@
         gainNode.connect(audioCtx.destination);
         const now = audioCtx.currentTime;
         
+        // Приглушаем музыку во время звуковых эффектов (Ducking)
+        bgMusic.volume = 0.05;
+
         if (type === 'hit') { 
             osc.type = 'square';
             osc.frequency.setValueAtTime(150, now);
@@ -363,6 +394,9 @@
             gainNode.gain.setValueAtTime(1, now);
             gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
             osc.start(now); osc.stop(now + 0.1);
+            
+            // Восстанавливаем музыку быстро, если только удар
+            setTimeout(() => { if(isPlaying) bgMusic.volume = 0.2; }, 150);
         } else if (type === 'success') { 
             osc.type = 'sine';
             osc.frequency.setValueAtTime(440, now);
@@ -371,6 +405,9 @@
             gainNode.gain.setValueAtTime(0.5, now);
             gainNode.gain.linearRampToValueAtTime(0, now + 0.5);
             osc.start(now); osc.stop(now + 0.5);
+            
+            // Восстанавливаем музыку после фанфар
+            setTimeout(() => { if(ui.finalScreen.style.display !== 'flex') bgMusic.volume = 0.2; }, 1000);
         } else if (type === 'error') { 
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(200, now);
@@ -378,6 +415,8 @@
             gainNode.gain.setValueAtTime(0.5, now);
             gainNode.gain.linearRampToValueAtTime(0, now + 0.4);
             osc.start(now); osc.stop(now + 0.4);
+
+            setTimeout(() => { if(ui.finalScreen.style.display !== 'flex') bgMusic.volume = 0.2; }, 1000);
         }
     }
 
@@ -422,6 +461,7 @@
         answersBox: document.getElementById('answers-container'),
         track: document.getElementById('track'),
         slider: document.getElementById('slider'),
+        machine: document.getElementById('silomer-machine'),
         btn: document.getElementById('hammer-btn'),
         feedback: document.getElementById('feedback-overlay'),
         fText: document.getElementById('feedback-text'),
@@ -445,7 +485,10 @@
 
     // Запуск по кнопке "НАЧАТЬ"
     ui.startBtn.addEventListener('click', () => {
-        if(audioCtx.state === 'suspended') audioCtx.resume(); // Включаем звук
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+        // Включаем музыку
+        bgMusic.play().catch(() => console.log("Браузер заблокировал автоплей"));
+        
         ui.startScreen.style.opacity = '0';
         setTimeout(() => {
             ui.startScreen.style.display = 'none';
@@ -453,10 +496,27 @@
         }, 300);
     });
 
+    // УДАР ПО ПРОБЕЛУ
+    window.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') {
+            e.preventDefault(); // Запрещаем скроллинг страницы пробелом
+            if (!ui.btn.disabled && isPlaying) {
+                ui.btn.classList.add('pressed'); // Визуально нажимаем кнопку
+                handleHit();
+            }
+        }
+    });
+    window.addEventListener('keyup', (e) => {
+        if (e.code === 'Space') {
+            ui.btn.classList.remove('pressed'); // Отпускаем кнопку
+        }
+    });
+
     function initGame() {
         currentQuestionIndex = 0;
         score = 0;
         updateScoreDisplay(0);
+        bgMusic.volume = 0.2;
         ui.finalScreen.style.display = 'none';
         loadQuestion();
     }
@@ -509,6 +569,12 @@
     function handleHit(e) {
         if(e) e.preventDefault();
         if (!isPlaying) return;
+        
+        // ЭФФЕКТ ТРЯСКИ
+        ui.machine.classList.remove('shake-effect');
+        void ui.machine.offsetWidth; // Магия браузера для перезапуска анимации
+        ui.machine.classList.add('shake-effect');
+
         playSound('hit');
         isPlaying = false;
         cancelAnimationFrame(animationFrameId);
@@ -615,6 +681,7 @@
     }
 
     function endGame() {
+        bgMusic.volume = 0.02; // Тихо-тихо на экране завершения
         ui.progBar.style.width = '100%';
         ui.finalScreen.style.display = 'flex';
         ui.finalScore.innerText = score;
@@ -631,8 +698,6 @@
         setTimeout(fireConfetti, 500);
     }
 
-    // При первой загрузке мы просто выстраиваем карточки, но не запускаем лазер.
-    // Лазер запустится только после нажатия "НАЧАТЬ!".
     alignAnswersContainer();
 </script>
 </body>
