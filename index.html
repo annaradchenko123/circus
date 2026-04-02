@@ -131,7 +131,9 @@
             90% { transform: translate(2px, 3px) rotate(0deg); }
             100% { transform: translate(0, 0) rotate(0deg); }
         }
-        .shake-effect { animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both; }
+        .shake-effect {
+            animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+        }
 
         /* ПЛАШКА ДЛЯ ОЧКОВ */
         #score-wrapper {
@@ -151,11 +153,11 @@
             z-index: 10;
         }
 
-        /* Сами цифры очков */
+        /* Сами цифры очков (Уменьшен шрифт) */
         #score-display {
             color: #ffd700; 
             font-weight: 900;
-            font-size: 2.8rem; 
+            font-size: 2.1rem; /* УМЕНЬШЕНО для аккуратности */
             text-shadow: 0 3px 6px rgba(0,0,0,0.8); 
             transition: transform 0.1s;
             margin-top: -6px; 
@@ -247,9 +249,23 @@
             z-index: 2;
         }
 
+        /* ШАПКА: Жизни и Вопрос */
+        #top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            width: 100%;
+            margin-bottom: 8px;
+            flex-shrink: 0;
+        }
+        
+        #lives-container {
+            font-size: 1.8rem;
+        }
+
         #progress-container { width: 100%; background: rgba(0,0,0,0.5); border-radius: 10px; height: 12px; margin-bottom: 15px; border: 2px solid #555; overflow: hidden; flex-shrink: 0; }
         #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #f1c40f, #f39c12); transition: width 0.3s ease; }
-        #progress-text { text-align: right; color: #f1c40f; font-weight: 700; font-size: 1.2rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0; }
+        #progress-text { text-align: right; color: #f1c40f; font-weight: 700; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; }
 
         #question-display {
             background-color: rgba(255, 255, 255, 0.95);
@@ -295,7 +311,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.15);
             z-index: 3;
             box-sizing: border-box;
-            transform-origin: left center; /* Чтобы анимация удара шла слева направо */
+            transform-origin: left center; /* Нужно для правильного удара слева */
         }
 
         /* ФИЗИЧЕСКИЙ УДАР ПО КАРТОЧКЕ (Card Smash) */
@@ -310,11 +326,10 @@
             animation: cardSmash 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
         }
 
-        /* ВСПЛЫВАЮЩИЙ ФИДБЕК ЗА УДАР */
+        /* ВСПЛЫВАЮЩИЙ ФИДБЕК ЗА УДАР ПО ЦЕНТРУ */
         #feedback-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
         #feedback-text { font-size: 5rem; font-weight: 900; text-align: center; text-transform: uppercase; text-shadow: 0 4px 15px rgba(0,0,0,0.4); margin-bottom: 10px; letter-spacing: 2px; }
         
-        /* СТИЛЬ ДЛЯ НАДПИСИ "КОМБО" */
         #feedback-combo {
             font-size: 3rem;
             font-weight: 900;
@@ -337,19 +352,49 @@
             padding: 10px 40px; 
             border-radius: 30px; 
             box-shadow: 0 10px 20px rgba(0,0,0,0.2); 
+            display: block; /* Снова показываем в центре */
         }
 
-        /* Финальный экран */
+        /* ФИНАЛЬНЫЙ ЭКРАН И СТАТИСТИКА */
         #final-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 30; display: none; text-align: center; backdrop-filter: blur(5px); }
-        #final-screen h2 { font-size: 4rem; font-weight: 900; margin: 0; color: #fff; text-transform: uppercase; letter-spacing: 2px; }
-        #final-score { font-size: 7rem; font-weight: 900; color: #ffd700; margin: 10px 0; text-shadow: 0 5px 20px rgba(243, 156, 18, 0.5); }
-        #final-rank { color: #2ecc71; font-size: 3rem; text-transform: uppercase; font-weight: 700; margin-bottom: 40px;}
-        .restart-btn { padding: 20px 60px; background-color: #ff7979; color: white; border: none; border-radius: 40px; font-size: 2rem; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 8px 0 #eb4d4b; text-transform: uppercase; }
+        #final-title { font-size: 4rem; font-weight: 900; margin: 0; color: #fff; text-transform: uppercase; letter-spacing: 2px; }
+        #final-score { font-size: 6.5rem; font-weight: 900; color: #ffd700; margin: 5px 0 0 0; text-shadow: 0 5px 20px rgba(243, 156, 18, 0.5); }
+        #final-rank { color: #2ecc71; font-size: 2.5rem; text-transform: uppercase; font-weight: 700; margin-bottom: 25px;}
+        
+        .stats-container {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px 40px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            border: 2px solid #ffd700;
+            text-align: left;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+        .stat-row {
+            color: #fff;
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 320px;
+            letter-spacing: 1px;
+        }
+        .stat-icon { margin-right: 15px; font-size: 2rem; }
+        .stat-row span:last-child { color: #f1c40f; font-weight: 900; font-size: 2rem; }
+
+        .restart-btn { padding: 15px 50px; background-color: #ff7979; color: white; border: none; border-radius: 40px; font-size: 2rem; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 8px 0 #eb4d4b; text-transform: uppercase; }
         .restart-btn:hover { transform: scale(1.05); }
         .restart-btn:active { transform: translateY(8px); box-shadow: 0 0 0 #eb4d4b; }
     </style>
 </head>
 <body>
+
+<!-- АУДИО ФОНОВОЙ МУЗЫКИ -->
+<audio id="bg-music" loop preload="auto" crossorigin="anonymous">
+    <source src="https://freepd.com/music/The%20Entertainer.mp3" type="audio/mpeg">
+</audio>
 
 <div id="game-wrapper">
     <div class="overlay-bg"></div>
@@ -359,8 +404,8 @@
         <div class="start-content">
             <h2>КАК ИГРАТЬ?</h2>
             <p>Золотой лазер быстро бегает вверх и вниз.</p>
-            <p>Прочитайте вопрос и нажмите на кнопку (ИЛИ на <b>ПРОБЕЛ</b>) в тот момент, когда лазер окажется ровно на правильном ответе!</p>
-            <p style="color:#e74c3c; font-size: 1.2rem;"><i>Подсказка: Отвечайте правильно без промахов, чтобы активировать 🔥 КОМБО x2 и x3!</i></p>
+            <p>Нажмите на кнопку (ИЛИ на <b>ПРОБЕЛ</b>) в тот момент, когда лазер окажется ровно на правильном ответе!</p>
+            <p style="color:#e74c3c; font-size: 1.2rem;"><i>У вас есть 3 права на ошибку. Отвечайте правильно, чтобы копить КОМБО x2 и x3!</i></p>
             <button id="start-btn">НАЧАТЬ!</button>
         </div>
     </div>
@@ -382,7 +427,11 @@
     </div>
 
     <div id="right-panel">
-        <div id="progress-text">Вопрос <span id="progress-num">1</span> из 12</div>
+        <!-- Шапка с Жизнями и Прогрессом -->
+        <div id="top-header">
+            <div id="lives-container">❤️❤️❤️</div>
+            <div id="progress-text">Вопрос <span id="progress-num">1</span> из 12</div>
+        </div>
         <div id="progress-container"><div id="progress-bar"></div></div>
         
         <div id="question-display">Загрузка...</div>
@@ -393,20 +442,31 @@
     <div id="feedback-overlay">
         <div id="feedback-text"></div>
         <div id="feedback-combo">🔥 КОМБО x2 🔥</div>
-        <div id="feedback-points"></div>
+        <div id="feedback-points"></div> 
     </div>
 
+    <!-- ФИНАЛЬНЫЙ ЭКРАН СО СТАТИСТИКОЙ -->
     <div id="final-screen">
-        <h2>ИГРА ЗАВЕРШЕНА</h2>
+        <h2 id="final-title">ИГРА ЗАВЕРШЕНА</h2>
         <div id="final-score">1200</div>
         <div id="final-rank">Мастер силы!</div>
+        
+        <div class="stats-container">
+            <div class="stat-row"><span class="stat-icon">🎯</span> Идеально: <span id="stat-perfect">0</span></div>
+            <div class="stat-row"><span class="stat-icon">👍</span> Отлично: <span id="stat-good">0</span></div>
+            <div class="stat-row"><span class="stat-icon">❌</span> Ошибки: <span id="stat-wrong">0</span></div>
+            <div class="stat-row"><span class="stat-icon">🔥</span> Макс. Комбо: <span id="stat-max-combo">x1</span></div>
+        </div>
+
         <button class="restart-btn" onclick="initGame()">ИГРАТЬ СНОВА</button>
     </div>
 </div>
 
 <script>
-    // НАСТРОЙКА АУДИО (Только эффекты)
+    // НАСТРОЙКА АУДИО И МУЗЫКИ
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const bgMusic = document.getElementById('bg-music');
+    bgMusic.volume = 0.2; 
 
     function playSound(type) {
         if(audioCtx.state === 'suspended') audioCtx.resume();
@@ -415,6 +475,8 @@
         osc.connect(gainNode);
         gainNode.connect(audioCtx.destination);
         const now = audioCtx.currentTime;
+        
+        bgMusic.volume = 0.05;
 
         if (type === 'hit') { 
             osc.type = 'square';
@@ -423,6 +485,8 @@
             gainNode.gain.setValueAtTime(1, now);
             gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
             osc.start(now); osc.stop(now + 0.1);
+            setTimeout(() => { if(ui.finalScreen.style.display !== 'flex') bgMusic.volume = 0.2; }, 300);
+
         } else if (type === 'success') { 
             osc.type = 'sine';
             osc.frequency.setValueAtTime(440, now);
@@ -431,6 +495,8 @@
             gainNode.gain.setValueAtTime(0.5, now);
             gainNode.gain.linearRampToValueAtTime(0, now + 0.5);
             osc.start(now); osc.stop(now + 0.5);
+            setTimeout(() => { if(ui.finalScreen.style.display !== 'flex') bgMusic.volume = 0.2; }, 1500);
+
         } else if (type === 'error') { 
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(200, now);
@@ -438,6 +504,7 @@
             gainNode.gain.setValueAtTime(0.5, now);
             gainNode.gain.linearRampToValueAtTime(0, now + 0.4);
             osc.start(now); osc.stop(now + 0.4);
+            setTimeout(() => { if(ui.finalScreen.style.display !== 'flex') bgMusic.volume = 0.2; }, 1000);
         }
     }
 
@@ -463,15 +530,17 @@
             { minScore: 0, title: "Новичок" },
             { minScore: 500, title: "Эксперт" },
             { minScore: 1000, title: "Мастер силы!" },
-            { minScore: 2000, title: "ЛЕГЕНДА АРКАДЫ!" } // Добавлен ранг для комбо-победителей
+            { minScore: 2000, title: "ЛЕГЕНДА АРКАДЫ!" } 
         ]
     };
 
     let currentQuestionIndex = 0;
     let score = 0;
-    let comboCount = 0;       // Текущая серия правильных ответов
-    let comboMultiplier = 1;  // Множитель очков (х1, х2, х3)
-
+    let comboCount = 0;       
+    let comboMultiplier = 1;  
+    let lives = 3;            // СИСТЕМА ЖИЗНЕЙ
+    let gameStats = { perfect: 0, good: 0, wrong: 0, maxCombo: 0 };
+    
     let animationFrameId;
     let laserY = 0; 
     let direction = 1; 
@@ -482,6 +551,7 @@
         progNum: document.getElementById('progress-num'),
         progBar: document.getElementById('progress-bar'),
         score: document.getElementById('score-display'),
+        lives: document.getElementById('lives-container'),
         question: document.getElementById('question-display'),
         answersBox: document.getElementById('answers-container'),
         track: document.getElementById('track'),
@@ -490,28 +560,31 @@
         btn: document.getElementById('hammer-btn'),
         feedback: document.getElementById('feedback-overlay'),
         fText: document.getElementById('feedback-text'),
-        fCombo: document.getElementById('feedback-combo'), // Плашка Комбо
+        fCombo: document.getElementById('feedback-combo'),
         fPoints: document.getElementById('feedback-points'),
         finalScreen: document.getElementById('final-screen'),
+        finalTitle: document.getElementById('final-title'),
         finalScore: document.getElementById('final-score'),
         finalRank: document.getElementById('final-rank'),
         startScreen: document.getElementById('start-screen'),
-        startBtn: document.getElementById('start-btn')
+        startBtn: document.getElementById('start-btn'),
+        statPerfect: document.getElementById('stat-perfect'),
+        statGood: document.getElementById('stat-good'),
+        statWrong: document.getElementById('stat-wrong'),
+        statMaxCombo: document.getElementById('stat-max-combo')
     };
 
-    // Привязываем высоту контейнера ответов к шкале
     function alignAnswersContainer() {
         const trackRect = ui.track.getBoundingClientRect();
         const rightPanelRect = document.getElementById('right-panel').getBoundingClientRect();
-        
         ui.answersBox.style.top = (trackRect.top - rightPanelRect.top) + 'px';
         ui.answersBox.style.height = trackRect.height + 'px';
     }
     window.addEventListener('resize', alignAnswersContainer);
 
-    // Запуск по кнопке "НАЧАТЬ"
     ui.startBtn.addEventListener('click', () => {
         if(audioCtx.state === 'suspended') audioCtx.resume();
+        bgMusic.play().catch((e) => console.log("Браузер пока заблокировал музыку"));
         ui.startScreen.style.opacity = '0';
         setTimeout(() => {
             ui.startScreen.style.display = 'none';
@@ -519,7 +592,6 @@
         }, 300);
     });
 
-    // УДАР ПО ПРОБЕЛУ
     window.addEventListener('keydown', (e) => {
         if (e.code === 'Space') {
             e.preventDefault(); 
@@ -530,9 +602,7 @@
         }
     });
     window.addEventListener('keyup', (e) => {
-        if (e.code === 'Space') {
-            ui.btn.classList.remove('pressed'); 
-        }
+        if (e.code === 'Space') { ui.btn.classList.remove('pressed'); }
     });
 
     function initGame() {
@@ -540,14 +610,32 @@
         score = 0;
         comboCount = 0;
         comboMultiplier = 1;
+        lives = 3;
+        gameStats = { perfect: 0, good: 0, wrong: 0, maxCombo: 0 }; 
+
         ui.score.classList.remove('combo-active');
         ui.score.innerText = "0";
+        bgMusic.volume = 0.2;
         ui.finalScreen.style.display = 'none';
+        
+        updateLivesDisplay();
         loadQuestion();
     }
 
+    function updateLivesDisplay() {
+        let html = '';
+        for(let i=0; i<3; i++) {
+            if (i < lives) {
+                html += '<span style="filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); margin-right: 5px;">❤️</span>';
+            } else {
+                html += '<span style="filter: grayscale(100%); opacity: 0.3; margin-right: 5px;">🖤</span>';
+            }
+        }
+        ui.lives.innerHTML = html;
+    }
+
     function loadQuestion() {
-        if (currentQuestionIndex >= gameConfig.questions.length) { endGame(); return; }
+        if (currentQuestionIndex >= gameConfig.questions.length) { endGame(false); return; }
 
         const qData = gameConfig.questions[currentQuestionIndex];
         
@@ -580,7 +668,6 @@
 
     function animateSlider() {
         if (!isPlaying) return;
-
         const trackHeight = ui.track.clientHeight;
         laserY += sliderSpeed * direction;
 
@@ -595,7 +682,6 @@
         if(e) e.preventDefault();
         if (!isPlaying) return;
         
-        // ТРЯСКА ЭКРАНА
         ui.machine.classList.remove('shake-effect');
         void ui.machine.offsetWidth; 
         ui.machine.classList.add('shake-effect');
@@ -604,7 +690,6 @@
         isPlaying = false;
         cancelAnimationFrame(animationFrameId);
         ui.btn.disabled = true;
-
         checkHit();
     }
 
@@ -636,43 +721,47 @@
         let message = "";
         let color = "";
         let isCorrect = (hitIndex === correctIndex);
-
         const slots = document.querySelectorAll('.answer-slot');
         
-        // ФИЗИЧЕСКИЙ ОТКЛИК КАРТОЧКИ (Card Smash)
+        // ФИЗИЧЕСКИЙ ОТКЛИК КАРТОЧКИ 
         if (hitIndex !== -1) {
             slots[hitIndex].classList.add('card-smash-anim');
         }
 
-        // ЛОГИКА КОМБО
+        // ЛОГИКА КОМБО И СТАТИСТИКИ
         if (isCorrect) {
             comboCount++;
-            comboMultiplier = Math.min(comboCount, 3); // Максимальное комбо x3
+            gameStats.maxCombo = Math.max(gameStats.maxCombo, comboCount);
+            comboMultiplier = Math.min(comboCount, 3);
         } else {
             comboCount = 0;
             comboMultiplier = 1;
+            lives--; // СНИМАЕМ ЖИЗНЬ
+            updateLivesDisplay();
         }
 
-        // РАСЧЕТ ОЧКОВ
         if (hitIndex === -1) {
             pointsEarned = gameConfig.points.miss;
             message = "ПОПРОБУЙ ЕЩЁ!";
             color = "#bdc3c7"; 
+            gameStats.wrong++; 
             playSound('error');
         } else if (isCorrect) {
             slots[hitIndex].style.borderColor = "#2ecc71"; 
             slots[hitIndex].style.backgroundColor = "#e8f8f5";
             playSound('success');
-            fireConfetti(); // Салют на правильный ответ
+            fireConfetti(); 
 
             if (accuracy > 0.6) { 
-                pointsEarned = gameConfig.points.perfect * comboMultiplier; // Применяем Комбо
+                pointsEarned = gameConfig.points.perfect * comboMultiplier; 
                 message = "ИДЕАЛЬНО!";
                 color = "#2ecc71";
+                gameStats.perfect++; 
             } else { 
-                pointsEarned = gameConfig.points.good * comboMultiplier; // Применяем Комбо
+                pointsEarned = gameConfig.points.good * comboMultiplier; 
                 message = "ОТЛИЧНО!";
                 color = "#f1c40f";
+                gameStats.good++; 
             }
         } else {
             slots[hitIndex].style.borderColor = "#e74c3c"; 
@@ -680,16 +769,16 @@
             pointsEarned = gameConfig.points.wrong;
             message = "ПОЧТИ!";
             color = "#e74c3c";
+            gameStats.wrong++; 
             playSound('error'); 
         }
 
-        // ПОКАЗ ФИДБЕКА И КОМБО
+        // ФИДБЕК ПО ЦЕНТРУ
         ui.fText.innerText = message;
         ui.fText.style.color = color;
         ui.fPoints.innerText = pointsEarned > 0 ? `+${pointsEarned}` : pointsEarned;
         ui.fPoints.style.color = color;
 
-        // Если комбо >= 2, показываем надпись и включаем пульсацию табло
         if (comboCount >= 2) {
             ui.fCombo.innerText = `🔥 КОМБО x${comboMultiplier} 🔥`;
             ui.fCombo.style.display = 'block';
@@ -698,15 +787,20 @@
             ui.fCombo.style.display = 'none';
             ui.score.classList.remove('combo-active');
         }
-        
+
         ui.feedback.style.opacity = '1';
         ui.feedback.style.backdropFilter = 'blur(3px)';
 
         updateScoreDisplay(pointsEarned);
 
+        // ПРОВЕРКА НА ОКОНЧАНИЕ ИГРЫ
         setTimeout(() => {
-            currentQuestionIndex++;
-            loadQuestion();
+            if (lives <= 0) {
+                endGame(true); // Game Over из-за жизней
+            } else {
+                currentQuestionIndex++;
+                loadQuestion();
+            }
         }, 2000); 
     }
 
@@ -716,7 +810,6 @@
         const step = (timestamp) => {
             if (!startTimestamp) startTimestamp = timestamp;
             const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-            // Плавное замедление в конце
             const easeProgress = progress * (2 - progress);
             const currentScore = Math.floor(start + (end - start) * easeProgress);
             
@@ -737,12 +830,10 @@
         if(score < 0) score = 0; 
         
         if(points !== 0) {
-            // Если табло НЕ пульсирует от комбо, то даем ему легкий всплеск (score-anim)
             if (!ui.score.classList.contains('combo-active')) {
                 ui.score.classList.add('score-anim');
                 setTimeout(() => ui.score.classList.remove('score-anim'), 300);
             }
-            // Запускаем "накрутку" цифр
             animateScore(oldScore, score, 1000);
         }
     }
@@ -751,12 +842,24 @@
         confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 }, colors: ['#ffd700', '#f1c40f', '#2ecc71', '#3498db'] });
     }
 
-    function endGame() {
-        ui.progBar.style.width = '100%';
+    function endGame(isDeath) {
+        bgMusic.volume = 0.02; 
         ui.finalScreen.style.display = 'flex';
         ui.finalScore.innerText = score;
-        ui.score.classList.remove('combo-active'); // Отключаем пульсацию на фоне
+        ui.score.classList.remove('combo-active'); 
         
+        if (isDeath) {
+            ui.finalTitle.innerText = "ИГРА ОКОНЧЕНА";
+            ui.finalTitle.style.color = "#ff7979";
+            ui.progBar.style.background = "#e74c3c"; // Красный прогресс бар
+        } else {
+            ui.finalTitle.innerText = "ПОБЕДА!";
+            ui.finalTitle.style.color = "#fff";
+            ui.progBar.style.width = '100%';
+            fireConfetti();
+            setTimeout(fireConfetti, 500);
+        }
+
         let rankStr = gameConfig.ranks[0].title;
         for (let i = gameConfig.ranks.length - 1; i >= 0; i--) {
             if (score >= gameConfig.ranks[i].minScore) {
@@ -765,8 +868,15 @@
             }
         }
         ui.finalRank.innerText = rankStr;
-        fireConfetti();
-        setTimeout(fireConfetti, 500);
+
+        // ЗАПОЛНЕНИЕ СТАТИСТИКИ
+        ui.statPerfect.innerText = gameStats.perfect;
+        ui.statGood.innerText = gameStats.good;
+        ui.statWrong.innerText = gameStats.wrong;
+        
+        let maxMult = Math.min(gameStats.maxCombo, 3);
+        let comboText = gameStats.maxCombo > 1 ? `x${maxMult} (${gameStats.maxCombo} подряд)` : "x1";
+        ui.statMaxCombo.innerText = comboText;
     }
 
     alignAnswersContainer();
