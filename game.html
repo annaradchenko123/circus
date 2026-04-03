@@ -85,6 +85,12 @@
             margin-bottom: 20px;
             font-weight: 700;
         }
+        #start-hint {
+            color: #e74c3c;
+            font-size: 1.2rem;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
         #start-btn {
             padding: 15px 60px;
             background-color: #ff7979;
@@ -167,6 +173,7 @@
 
         /* ПРАВАЯ ПАНЕЛЬ */
         #right-panel { width: 65%; height: 100%; display: flex; flex-direction: column; padding: 30px 60px 40px 20px; box-sizing: border-box; position: relative; z-index: 2; }
+        #top-info-bar { display: flex; justify-content: flex-end; align-items: flex-end; margin-bottom: 8px; flex-shrink: 0; }
         #progress-container { width: 100%; background: rgba(0,0,0,0.5); border-radius: 10px; height: 12px; margin-bottom: 15px; border: 2px solid #555; overflow: hidden; flex-shrink: 0; }
         #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #f1c40f, #f39c12); transition: width 0.3s ease; }
         #progress-text { text-align: right; color: #f1c40f; font-weight: 700; font-size: 1.2rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0; }
@@ -200,7 +207,7 @@
         #final-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 30; display: none; text-align: center; backdrop-filter: blur(5px); }
         #final-title { font-size: 4rem; font-weight: 900; margin: 0; color: #fff; text-transform: uppercase; letter-spacing: 2px; }
         #final-score { font-size: 6rem; font-weight: 900; color: #ffd700; margin: 5px 0 0 0; text-shadow: 0 5px 20px rgba(243, 156, 18, 0.5); }
-        #final-rank { color: #2ecc71; font-size: 2.5rem; text-transform: uppercase; font-weight: 700; margin-bottom: 25px;}
+        #final-rank { color: #2ecc71; font-size: 2.5rem; text-transform: uppercase; font-weight: 900; margin-bottom: 25px; text-shadow: 0 2px 10px rgba(46, 204, 113, 0.4);}
         
         .stats-container { background: rgba(0, 0, 0, 0.6); padding: 20px 40px; border-radius: 20px; margin-bottom: 30px; border: 2px solid #ffd700; text-align: left; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
         .stat-row { color: #fff; font-size: 1.4rem; font-weight: 700; margin: 8px 0; display: flex; align-items: center; justify-content: space-between; width: 300px; letter-spacing: 1px; }
@@ -225,7 +232,7 @@
         <div class="start-content">
             <h2 id="start-title">КАК ИГРАТЬ?</h2>
             <p id="start-desc">Золотой лазер быстро бегает вверх и вниз.<br>Нажмите на кнопку (ИЛИ на <b>ПРОБЕЛ</b>), когда лазер окажется ровно на правильном ответе!</p>
-            <p style="color:#e74c3c; font-size: 1.2rem;"><i>Подсказка: Отвечайте правильно без промахов, чтобы активировать 🔥 КОМБО x2 и x3!</i></p>
+            <div id="start-hint">Подсказка: Отвечайте правильно без промахов, чтобы активировать 🔥 КОМБО x2 и x3!</div>
             <button id="start-btn">НАЧАТЬ!</button>
         </div>
     </div>
@@ -239,7 +246,9 @@
     </div>
 
     <div id="right-panel">
-        <div id="progress-text"><span id="lbl-prog">Вопрос</span> <span id="progress-num">1</span> / <span id="progress-total">12</span></div>
+        <div id="top-info-bar">
+            <div id="progress-text"><span id="lbl-prog">Вопрос</span> <span id="progress-num">1</span> / <span id="progress-total">12</span></div>
+        </div>
         <div id="progress-container"><div id="progress-bar"></div></div>
         
         <div id="question-display">Загрузка...</div>
@@ -255,8 +264,8 @@
     <!-- ФИНАЛЬНЫЙ ЭКРАН -->
     <div id="final-screen">
         <h2 id="final-title">ИГРА ЗАВЕРШЕНА</h2>
-        <div id="final-score">1200</div>
-        <div id="final-rank">Мастер силы!</div>
+        <div id="final-score">0</div>
+        <div id="final-rank">Новичок</div>
         
         <div class="stats-container">
             <div class="stat-row"><span class="stat-icon">🎯</span> <span id="lbl-s1">Идеально:</span> <span id="stat-perfect">0</span></div>
@@ -271,7 +280,7 @@
 
 <script>
     // ---------------------------------------------------------
-    // БЛОК ЧТЕНИЯ НАСТРОЕК ОТ РЕДАКТОРА (ЧЕРЕЗ ССЫЛКУ)
+    // ЧТЕНИЕ НАСТРОЕК ОТ РЕДАКТОРА (ЧЕРЕЗ ССЫЛКУ)
     // ---------------------------------------------------------
     const urlParams = new URLSearchParams(window.location.search);
     const encodedData = urlParams.get('data');
@@ -281,12 +290,12 @@
         try {
             customCFG = JSON.parse(decodeURIComponent(atob(decodeURIComponent(encodedData))));
         } catch (e) {
-            console.error("Ошибка чтения данных из ссылки. Загружены базовые вопросы.");
+            console.error("Ошибка чтения данных из ссылки. Загружены базовые настройки.");
         }
     }
 
     // ---------------------------------------------------------
-    // БАЗОВАЯ КОНФИГУРАЦИЯ ИГРЫ (если открыли без редактора)
+    // БАЗОВАЯ КОНФИГУРАЦИЯ (По умолчанию)
     // ---------------------------------------------------------
     let gameConfig = {
         sliderSpeedMultiplier: 0.9, 
@@ -295,25 +304,12 @@
             { text: "Какая планета самая большая в Солнечной системе?", options: ["Земля", "Марс", "Юпитер"], correctIndex: 2 },
             { text: "Сколько будет 7 умножить на 8?", options: ["54", "56", "64"], correctIndex: 1 },
             { text: "В каком году человек впервые полетел в космос?", options: ["1957", "1961", "1969"], correctIndex: 1 },
-            { text: "Какой океан самый большой на Земле?", options: ["Атлантический", "Индийский", "Тихий"], correctIndex: 2 },
-            { text: "Самый твердый минерал в природе?", options: ["Кварц", "Алмаз", "Изумруд"], correctIndex: 1 },
-            { text: "Сколько материков на планете Земля?", options: ["4", "5", "6"], correctIndex: 2 },
-            { text: "Какая химическая формула у воды?", options: ["CO2", "H2O", "O2"], correctIndex: 1 },
-            { text: "Столица Австралии?", options: ["Сидней", "Мельбурн", "Канберра"], correctIndex: 2 },
-            { text: "Кто написал произведение «Муму»?", options: ["Пушкин", "Тургенев", "Толстой"], correctIndex: 1 },
-            { text: "Самая длинная река в мире?", options: ["Нил", "Амазонка", "Янцзы"], correctIndex: 1 },
-            { text: "Какой газ мы вдыхаем для жизни?", options: ["Азот", "Кислород", "Углекислый газ"], correctIndex: 1 },
-            { text: "Столица Японии?", options: ["Пекин", "Сеул", "Токио"], correctIndex: 2 }
-        ],
-        ranks: [
-            { minScore: 0, title: "Новичок" },
-            { minScore: 500, title: "Эксперт" },
-            { minScore: 1000, title: "Мастер силы!" },
-            { minScore: 2000, title: "ЛЕГЕНДА АРКАДЫ!" } 
+            { text: "Какой океан самый большой на Земле?", options: ["Атлантический", "Индийский", "Тихий"], correctIndex: 2 }
         ],
         texts: {
-            st: "КАК ИГРАТЬ?", sd: "Золотой лазер быстро бегает вверх и вниз.<br>Нажмите на кнопку (ИЛИ на <b>ПРОБЕЛ</b>), когда лазер окажется ровно на правильном ответе!",
+            st: "КАК ИГРАТЬ?", sd: "Золотой лазер быстро бегает вверх и вниз.<br>Нажмите на кнопку (ИЛИ на <b>ПРОБЕЛ</b>), когда лазер окажется ровно на правильном ответе!", sh: "Подсказка: Отвечайте правильно без промахов, чтобы активировать 🔥 КОМБО x2 и x3!",
             bs: "НАЧАТЬ!", br: "ИГРАТЬ СНОВА", pr: "Вопрос", hp: "ИДЕАЛЬНО!", hg: "ОТЛИЧНО!", hw: "ОШИБКА!", hm: "ПРОМАХ!", cmb: "КОМБО", fw: "ИГРА ЗАВЕРШЕНА", sr: "подряд",
+            r1: "Новичок", r2: "Эксперт", r3: "Мастер силы!", r4: "ЛЕГЕНДА АРКАДЫ!",
             s1: "Идеально:", s2: "Отлично:", s3: "Ошибки:", s4: "Макс. Комбо:"
         }
     };
@@ -323,11 +319,7 @@
     // ---------------------------------------------------------
     if (customCFG) {
         if (customCFG.questions && customCFG.questions.length > 0) {
-            gameConfig.questions = customCFG.questions.map(q => ({
-                text: q.q,
-                options: q.opt,
-                correctIndex: q.c
-            }));
+            gameConfig.questions = customCFG.questions.map(q => ({ text: q.q, options: q.opt, correctIndex: q.c }));
         }
         if (customCFG.texts) {
             gameConfig.texts = customCFG.texts;
@@ -339,9 +331,10 @@
         }
     }
 
-    // Применяем тексты интерфейса
+    // Вставляем тексты в интерфейс
     document.getElementById('start-title').innerText = gameConfig.texts.st;
     document.getElementById('start-desc').innerHTML = gameConfig.texts.sd;
+    document.getElementById('start-hint').innerHTML = gameConfig.texts.sh;
     document.getElementById('start-btn').innerText = gameConfig.texts.bs;
     document.getElementById('lbl-prog').innerText = gameConfig.texts.pr;
     document.getElementById('progress-total').innerText = gameConfig.questions.length;
@@ -416,7 +409,7 @@
 
     ui.startBtn.addEventListener('click', () => {
         if(audioCtx.state === 'suspended') audioCtx.resume();
-        bgMusic.play().catch((e) => console.log("Музыка заблокирована", e));
+        bgMusic.play().catch((e) => console.log("Музыка заблокирована браузером:", e));
         ui.startScreen.style.opacity = '0';
         setTimeout(() => { ui.startScreen.style.display = 'none'; initGame(); }, 300);
     });
@@ -532,8 +525,11 @@
         bgMusic.volume = 0.02; ui.progBar.style.width = '100%'; ui.finalScreen.style.display = 'flex'; ui.finalScore.innerText = score; ui.score.classList.remove('combo-active'); 
         fireConfetti(); setTimeout(fireConfetti, 500);
         
-        let rankStr = gameConfig.ranks[0].title;
-        for (let i = gameConfig.ranks.length - 1; i >= 0; i--) { if (score >= gameConfig.ranks[i].minScore) { rankStr = gameConfig.ranks[i].title; break; } }
+        // Логика рангов
+        let rankStr = gameConfig.texts.r1;
+        if (score >= 2000) rankStr = gameConfig.texts.r4;
+        else if (score >= 1000) rankStr = gameConfig.texts.r3;
+        else if (score >= 500) rankStr = gameConfig.texts.r2;
         ui.finalRank.innerText = rankStr;
 
         ui.statPerfect.innerText = gameStats.perfect; ui.statGood.innerText = gameStats.good; ui.statWrong.innerText = gameStats.wrong;
