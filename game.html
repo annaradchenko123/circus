@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Игра: Силомер</title>
+    <!-- Библиотека для салюта -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Ubuntu:wght@400;700;900&display=swap');
@@ -51,7 +52,6 @@
         #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #f1c40f, #f39c12); transition: width 0.3s ease; }
         #progress-text { text-align: right; color: #f1c40f; font-weight: 700; font-size: 1.1rem; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0; }
 
-        /* ИСПРАВЛЕННЫЕ ОТСТУПЫ ВОПРОСА И ОТВЕТОВ */
         #question-display {
             background-color: var(--panel-bg); color: var(--text-color);
             padding: 15px 20px; border-radius: 15px; font-size: 1.6rem; font-weight: 700; text-align: center;
@@ -154,7 +154,7 @@
     let gameConfig = {
         sliderSpeedMultiplier: 0.9, 
         points: { perfect: 100, good: 70, wrong: -80, miss: -50 },
-        questions: [{ text: "Укажите правильный ответ:", options: ["Неверно", "Правильно", "Неверно"], correctIndex: 1 }],
+        questions: [{ text: "Укажите правильный ответ:", options: ["Правильно", "Неверно 1", "Неверно 2"], correctIndex: 0 }],
         texts: {
             st: "КАК ИГРАТЬ?", sd: "Золотой лазер быстро бегает вверх и вниз.<br>Нажмите на кнопку (ИЛИ на <b>ПРОБЕЛ</b>), когда лазер окажется ровно на правильном ответе!", sh: "Подсказка: Отвечайте правильно без промахов, чтобы активировать 🔥 КОМБО x2 и x3!",
             bs: "НАЧАТЬ!", br: "ИГРАТЬ СНОВА", pr: "Вопрос", hp: "ИДЕАЛЬНО!", hg: "ОТЛИЧНО!", hw: "ОШИБКА!", hm: "ПРОМАХ!", cmb: "КОМБО", fw: "ИГРА ЗАВЕРШЕНА", sr: "подряд",
@@ -204,6 +204,7 @@
     let gameStats = { perfect: 0, good: 0, wrong: 0, maxCombo: 0 }; 
     let animationFrameId; let laserY = 0; let direction = 1; let isPlaying = false;
     let sliderSpeed = 5 * gameConfig.sliderSpeedMultiplier;
+    let activeCorrectIndex = 0; // Переменная для отслеживания правильного ответа после перемешивания
 
     const ui = {
         progNum: document.getElementById('progress-num'), progBar: document.getElementById('progress-bar'),
@@ -254,8 +255,21 @@
         ui.question.innerText = qData.text;
 
         ui.answersBox.innerHTML = ''; alignAnswersContainer();
-        qData.options.forEach((opt, index) => {
-            const div = document.createElement('div'); div.className = 'answer-slot'; div.innerText = opt; div.dataset.index = index;
+
+        // ЛОГИКА ПЕРЕМЕШИВАНИЯ (Рандомизация ответов)
+        let optionsToShuffle = qData.options.map((text, i) => ({ text: text, isCorrect: (i === qData.correctIndex) }));
+        
+        for (let i = optionsToShuffle.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [optionsToShuffle[i], optionsToShuffle[j]] = [optionsToShuffle[j], optionsToShuffle[i]];
+        }
+
+        optionsToShuffle.forEach((opt, index) => {
+            if (opt.isCorrect) activeCorrectIndex = index; // Запоминаем новое место правильного ответа
+            const div = document.createElement('div'); 
+            div.className = 'answer-slot'; 
+            div.innerText = opt.text; 
+            div.dataset.index = index;
             ui.answersBox.appendChild(div);
         });
 
@@ -293,7 +307,7 @@
     }
 
     function processResult(hitIndex, accuracy) {
-        const correctIndex = gameConfig.questions[currentQuestionIndex].correctIndex;
+        const correctIndex = activeCorrectIndex; // Используем обновленный индекс после перемешивания
         let pointsEarned = 0; let message = ""; let color = ""; let isCorrect = (hitIndex === correctIndex);
         const slots = document.querySelectorAll('.answer-slot');
         
