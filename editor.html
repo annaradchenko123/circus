@@ -11,7 +11,6 @@
         .container { max-width: 1300px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
         h1 { text-align: center; color: #2c3e50; margin-top: 0; border-bottom: 2px solid #ecf0f1; padding-bottom: 15px; }
         
-        /* ДВУХКОЛОНОЧНЫЙ МАКЕТ */
         .main-layout { display: flex; gap: 40px; align-items: flex-start; margin-top: 20px; }
         .left-col { flex: 1; min-width: 0; }
         .right-col { width: 380px; position: sticky; top: 20px; flex-shrink: 0; }
@@ -41,30 +40,20 @@
         .preview-title { text-align: center; color: #e67e22; font-size: 1.2rem; margin-bottom: 15px; font-weight: bold; text-transform: uppercase; }
         #preview-box {
             background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.3)), url('https://i.postimg.cc/HsxzZ6mn/image.png') center/cover;
-            padding: 30px 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            min-height: 350px;
+            padding: 30px 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex; flex-direction: column; gap: 15px; min-height: 350px;
         }
         #prev-q {
             border: 4px solid #f39c12; border-radius: 15px; padding: 15px 20px;
             font-size: 1.4rem; font-weight: 700; text-align: center; min-height: 70px;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
         .prev-a {
             border: 3px solid #cbd5e1; border-radius: 12px; padding: 12px 20px;
-            font-size: 1.2rem; font-weight: 700; text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            font-size: 1.2rem; font-weight: 700; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
 
-        @media (max-width: 1000px) {
-            .main-layout { flex-direction: column; }
-            .right-col { width: 100%; position: static; }
-        }
+        @media (max-width: 1000px) { .main-layout { flex-direction: column; } .right-col { width: 100%; position: static; } }
     </style>
 </head>
 <body>
@@ -110,7 +99,7 @@
             </div>
 
             <div class="section">
-                <h2 id="lbl-texts-sec">📝 Игровые тексты</h2>
+                <h2 id="lbl-texts-sec">📝 Игровые тексты (Автозаполнение)</h2>
                 <div class="row">
                     <div class="col"><label id="lbl-start-title">Заголовок</label><input type="text" id="t-start-title"></div>
                     <div class="col"><label id="lbl-start-hint">Подсказка</label><input type="text" id="t-start-hint"></div>
@@ -124,14 +113,18 @@
             </div>
 
             <div class="section">
-                <h2 id="lbl-hit-sec">💥 Фидбек и Ранги</h2>
+                <h2 id="lbl-hit-sec">💥 Фидбек на удар</h2>
                 <div class="row">
                     <div class="col"><label id="lbl-hit-perf">Идеально</label><input type="text" id="t-hit-perfect"></div>
                     <div class="col"><label id="lbl-hit-good">Отлично</label><input type="text" id="t-hit-good"></div>
                     <div class="col"><label id="lbl-hit-wrong">Ошибка</label><input type="text" id="t-hit-wrong"></div>
                     <div class="col"><label id="lbl-hit-miss">Промах</label><input type="text" id="t-hit-miss"></div>
                     <div class="col"><label id="lbl-combo">КОМБО</label><input type="text" id="t-combo"></div>
-                </div><br>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 id="lbl-fin-sec">🏆 Финальный экран и Ранги</h2>
                 <div class="row">
                     <div class="col"><label id="lbl-fin-win">Текст Победы</label><input type="text" id="t-fin-win"></div>
                     <div class="col"><label id="lbl-stat-row">"подряд"</label><input type="text" id="t-stat-row"></div>
@@ -181,81 +174,90 @@
 </div>
 
 <script>
+    // БАЗА ВСЕХ ПЕРЕВОДОВ
     const i18n = {
         ru: {
-            ui: { title: "🛠️ Конструктор Силомера", langSec: "🌐 Язык и Дизайн", lang: "Язык интерфейса", font: "Шрифт", color: "Цвет текста", bg: "Цвет плашек", opacity: "Прозрачность:", texts: "📝 Игровые тексты", stTitle: "Заголовок", stDesc: "Описание", stHint: "Подсказка", btnStart: "СТАРТ", btnRestart: "РЕСТАРТ", prog: "Вопрос N из M", hit: "💥 Фидбек и Ранги", hitPerf: "Идеально", hitGood: "Отлично", hitWrong: "Ошибка", hitMiss: "Промах", combo: "КОМБО", finWin: "Текст Победы", statRow: "Приписка 'подряд'", r1: "Ранг 1", r2: "Ранг 2", r3: "Ранг 3", r4: "Ранг 4", s1: "Идеально", s2: "Отлично", s3: "Ошибки", s4: "Макс Комбо", qSec: "❓ Вопросы", addQ: "+ ДОБАВИТЬ ВОПРОС", gen: "СГЕНЕРИРОВАТЬ ИГРУ 🚀", del: "Удалить", qPh: "Введите вопрос...", oPh: "Вариант", cAns: "Правильный ответ:", preview: "👁️ Предпросмотр дизайна", prevQ: "Пример вашего вопроса...", prevA: "Вариант" },
-            game: { st: "КАК ИГРАТЬ?", sd: "Золотой лазер быстро бегает вверх и вниз. Нажмите на кнопку (ИЛИ на <b>ПРОБЕЛ</b>), когда лазер окажется ровно на правильном ответе!", sh: "Подсказка: Отвечайте правильно без промахов, чтобы активировать 🔥 КОМБО x2 и x3!", bs: "НАЧАТЬ!", br: "ИГРАТЬ СНОВА", pr: "Вопрос", hp: "ИДЕАЛЬНО!", hg: "ОТЛИЧНО!", hw: "ОШИБКА!", hm: "ПРОМАХ!", cmb: "КОМБО", fw: "ИГРА ЗАВЕРШЕНА", sr: "подряд", r1: "Новичок", r2: "Эксперт", r3: "Мастер силы!", r4: "ЛЕГЕНДА АРКАДЫ!", s1: "Идеально:", s2: "Отлично:", s3: "Ошибки:", s4: "Макс. Комбо:" }
+            ui: { title: "🛠️ Конструктор Силомера", langSec: "🌐 Язык и Дизайн", lang: "Язык интерфейса", font: "Шрифт", color: "Цвет текста", bg: "Цвет плашек", opacity: "Прозрачность:", texts: "📝 Игровые тексты (Автозаполнение)", stTitle: "Заголовок", stDesc: "Описание", stHint: "Подсказка", btnStart: "СТАРТ", btnRestart: "РЕСТАРТ", prog: "Вопрос N из M", hit: "💥 Фидбек на удар", hitPerf: "Идеально", hitGood: "Отлично", hitWrong: "Ошибка", hitMiss: "Промах", combo: "КОМБО", fin: "🏆 Финальный экран и Ранги", finWin: "Текст Победы", statRow: "Приписка 'подряд'", r1: "Ранг 1", r2: "Ранг 2", r3: "Ранг 3", r4: "Ранг 4", s1: "Идеально", s2: "Отлично", s3: "Ошибки", s4: "Макс Комбо", qSec: "❓ Вопросы", addQ: "+ ДОБАВИТЬ ВОПРОС", gen: "СГЕНЕРИРОВАТЬ ИГРУ 🚀", del: "Удалить", qPh: "Введите вопрос...", oPh: "Вариант", cAns: "Правильный ответ:", preview: "👁️ Предпросмотр дизайна", prevQ: "Пример вашего вопроса...", prevA: "Вариант" },
+            game: { st: "КАК ИГРАТЬ?", sd: "Золотой лазер быстро бегает вверх и вниз. Нажмите на кнопку (ИЛИ на ПРОБЕЛ), когда лазер окажется ровно на правильном ответе!", sh: "Подсказка: Отвечайте правильно без промахов, чтобы активировать 🔥 КОМБО x2 и x3!", bs: "НАЧАТЬ!", br: "ИГРАТЬ СНОВА", pr: "Вопрос", hp: "ИДЕАЛЬНО!", hg: "ОТЛИЧНО!", hw: "ОШИБКА!", hm: "ПРОМАХ!", cmb: "КОМБО", fw: "ИГРА ЗАВЕРШЕНА", sr: "подряд", r1: "Новичок", r2: "Эксперт", r3: "Мастер силы!", r4: "ЛЕГЕНДА АРКАДЫ!", s1: "Идеально:", s2: "Отлично:", s3: "Ошибки:", s4: "Макс. Комбо:" }
         },
         en: {
-            ui: { title: "🛠️ Arcade Game Maker", langSec: "🌐 Language & Design", lang: "Language", font: "Font", color: "Text Color", bg: "Panel Color", opacity: "Opacity:", texts: "📝 Texts", stTitle: "Title", stDesc: "Description", stHint: "Hint", btnStart: "START", btnRestart: "RESTART", prog: "Question N of M", hit: "💥 Feedback & Ranks", hitPerf: "Perfect", hitGood: "Good", hitWrong: "Wrong", hitMiss: "Miss", combo: "COMBO", finWin: "Victory Text", statRow: "Suffix 'in a row'", r1: "Rank 1", r2: "Rank 2", r3: "Rank 3", r4: "Rank 4", s1: "Perfect", s2: "Good", s3: "Mistakes", s4: "Max Combo", qSec: "❓ Questions", addQ: "+ ADD QUESTION", gen: "GENERATE GAME 🚀", del: "Delete", qPh: "Enter question...", oPh: "Option", cAns: "Correct answer:", preview: "👁️ Live Preview", prevQ: "Sample question...", prevA: "Option" },
-            game: { st: "HOW TO PLAY?", sd: "The golden laser moves fast. Hit the button (OR press <b>SPACE</b>) exactly when the laser is on the correct answer!", sh: "Hint: Answer correctly without missing to activate 🔥 COMBO x2 and x3!", bs: "START!", br: "PLAY AGAIN", pr: "Question", hp: "PERFECT!", hg: "GOOD!", hw: "WRONG!", hm: "MISS!", cmb: "COMBO", fw: "GAME COMPLETED", sr: "in a row", r1: "Beginner", r2: "Expert", r3: "Power Master!", r4: "ARCADE LEGEND!", s1: "Perfect:", s2: "Good:", s3: "Mistakes:", s4: "Max Combo:" }
+            ui: { title: "🛠️ Arcade Game Maker", langSec: "🌐 Language & Design", lang: "Language", font: "Font", color: "Text Color", bg: "Panel Color", opacity: "Opacity:", texts: "📝 Texts (Auto-fill)", stTitle: "Title", stDesc: "Description", stHint: "Hint", btnStart: "START", btnRestart: "RESTART", prog: "Question N of M", hit: "💥 Hit Feedback", hitPerf: "Perfect", hitGood: "Good", hitWrong: "Wrong", hitMiss: "Miss", combo: "COMBO", fin: "🏆 Final Screen & Ranks", finWin: "Victory Text", statRow: "Suffix 'in a row'", r1: "Rank 1", r2: "Rank 2", r3: "Rank 3", r4: "Rank 4", s1: "Perfect", s2: "Good", s3: "Mistakes", s4: "Max Combo", qSec: "❓ Questions", addQ: "+ ADD QUESTION", gen: "GENERATE GAME 🚀", del: "Delete", qPh: "Enter question...", oPh: "Option", cAns: "Correct answer:", preview: "👁️ Live Preview", prevQ: "Sample question...", prevA: "Option" },
+            game: { st: "HOW TO PLAY?", sd: "The golden laser moves fast. Hit the button (OR press SPACE) exactly when the laser is on the correct answer!", sh: "Hint: Answer correctly without missing to activate 🔥 COMBO x2 and x3!", bs: "START!", br: "PLAY AGAIN", pr: "Question", hp: "PERFECT!", hg: "GOOD!", hw: "WRONG!", hm: "MISS!", cmb: "COMBO", fw: "GAME COMPLETED", sr: "in a row", r1: "Beginner", r2: "Expert", r3: "Power Master!", r4: "ARCADE LEGEND!", s1: "Perfect:", s2: "Good:", s3: "Mistakes:", s4: "Max Combo:" }
         },
         es: {
-            ui: { title: "🛠️ Creador de Juegos", langSec: "🌐 Idioma y Diseño", lang: "Idioma", font: "Fuente", color: "Color texto", bg: "Color panel", opacity: "Opacidad:", texts: "📝 Textos", stTitle: "Título", stDesc: "Descripción", stHint: "Pista", btnStart: "INICIO", btnRestart: "REINICIAR", prog: "Pregunta N de M", hit: "💥 Impacto y Rangos", hitPerf: "Perfecto", hitGood: "Bien", hitWrong: "Error", hitMiss: "Fallo", combo: "COMBO", finWin: "Victoria", statRow: "Sufijo 'seguidos'", r1: "Rango 1", r2: "Rango 2", r3: "Rango 3", r4: "Rango 4", s1: "Perfecto", s2: "Bien", s3: "Errores", s4: "Combo Máx", qSec: "❓ Preguntas", addQ: "+ PREGUNTA", gen: "GENERAR JUEGO 🚀", del: "Eliminar", qPh: "Escribe la pregunta...", oPh: "Opción", cAns: "Respuesta:", preview: "👁️ Vista Previa", prevQ: "Ejemplo de pregunta...", prevA: "Opción" },
-            game: { st: "¿CÓMO JUGAR?", sd: "El láser dorado se mueve rápido. ¡Presiona el botón (O la tecla <b>ESPACIO</b>) cuando el láser esté en la respuesta correcta!", sh: "Pista: ¡Responde correctamente sin fallar para activar 🔥 COMBO x2 y x3!", bs: "¡EMPEZAR!", br: "VOLVER A JUGAR", pr: "Pregunta", hp: "¡PERFECTO!", hg: "¡BIEN!", hw: "¡ERROR!", hm: "¡FALLO!", cmb: "COMBO", fw: "JUEGO COMPLETADO", sr: "seguidos", r1: "Principiante", r2: "Experto", r3: "¡Maestro!", r4: "¡LEYENDA!", s1: "Perfecto:", s2: "Bien:", s3: "Errores:", s4: "Combo Máx:" }
+            ui: { title: "🛠️ Creador de Juegos", langSec: "🌐 Idioma y Diseño", lang: "Idioma", font: "Fuente", color: "Color texto", bg: "Color panel", opacity: "Opacidad:", texts: "📝 Textos (Autocompletar)", stTitle: "Título", stDesc: "Descripción", stHint: "Pista", btnStart: "INICIO", btnRestart: "REINICIAR", prog: "Pregunta N de M", hit: "💥 Feedback", hitPerf: "Perfecto", hitGood: "Bien", hitWrong: "Error", hitMiss: "Fallo", combo: "COMBO", fin: "🏆 Final y Rangos", finWin: "Victoria", statRow: "Sufijo 'seguidos'", r1: "Rango 1", r2: "Rango 2", r3: "Rango 3", r4: "Rango 4", s1: "Perfecto", s2: "Bien", s3: "Errores", s4: "Combo Máx", qSec: "❓ Preguntas", addQ: "+ PREGUNTA", gen: "GENERAR JUEGO 🚀", del: "Eliminar", qPh: "Escribe la pregunta...", oPh: "Opción", cAns: "Respuesta:", preview: "👁️ Vista Previa", prevQ: "Ejemplo de pregunta...", prevA: "Opción" },
+            game: { st: "¿CÓMO JUGAR?", sd: "El láser dorado se mueve rápido. ¡Presiona el botón (O ESPACIO) cuando el láser esté en la respuesta correcta!", sh: "Pista: ¡Responde correctamente sin fallar para activar 🔥 COMBO x2 y x3!", bs: "¡EMPEZAR!", br: "VOLVER A JUGAR", pr: "Pregunta", hp: "¡PERFECTO!", hg: "¡BIEN!", hw: "¡ERROR!", hm: "¡FALLO!", cmb: "COMBO", fw: "JUEGO COMPLETADO", sr: "seguidos", r1: "Principiante", r2: "Experto", r3: "¡Maestro!", r4: "¡LEYENDA!", s1: "Perfecto:", s2: "Bien:", s3: "Errores:", s4: "Combo Máx:" }
         },
         de: {
-            ui: { title: "🛠️ Spiel-Generator", langSec: "🌐 Sprache & Design", lang: "Sprache", font: "Schriftart", color: "Textfarbe", bg: "Panel-Farbe", opacity: "Deckkraft:", texts: "📝 Texte", stTitle: "Titel", stDesc: "Beschreibung", stHint: "Tipp", btnStart: "START", btnRestart: "NEUSTART", prog: "Frage N von M", hit: "💥 Treffer & Ränge", hitPerf: "Perfekt", hitGood: "Gut", hitWrong: "Falsch", hitMiss: "Daneben", combo: "KOMBO", finWin: "Sieg", statRow: "Zusatz 'in Folge'", r1: "Rang 1", r2: "Rang 2", r3: "Rang 3", r4: "Rang 4", s1: "Perfekt", s2: "Gut", s3: "Fehler", s4: "Max Kombo", qSec: "❓ Fragen", addQ: "+ FRAGE", gen: "SPIEL GENERIEREN 🚀", del: "Löschen", qPh: "Frage eingeben...", oPh: "Option", cAns: "Richtige Antwort:", preview: "👁️ Vorschau", prevQ: "Beispielfrage...", prevA: "Option" },
-            game: { st: "WIE SPIELT MAN?", sd: "Der goldene Laser bewegt sich schnell. Drücke den Knopf (ODER <b>LEERTASTE</b>), wenn der Laser auf der richtigen Antwort ist!", sh: "Tipp: Antworte richtig, ohne zu verfehlen, um 🔥 KOMBO x2 und x3 zu aktivieren!", bs: "START!", br: "NOCHMAL SPIELEN", pr: "Frage", hp: "PERFEKT!", hg: "GUT!", hw: "FALSCH!", hm: "DANEBEN!", cmb: "KOMBO", fw: "SPIEL ABGESCHLOSSEN", sr: "in Folge", r1: "Anfänger", r2: "Experte", r3: "Meister!", r4: "LEGENDE!", s1: "Perfekt:", s2: "Gut:", s3: "Fehler:", s4: "Max Kombo:" }
+            ui: { title: "🛠️ Spiel-Generator", langSec: "🌐 Sprache & Design", lang: "Sprache", font: "Schriftart", color: "Textfarbe", bg: "Panel-Farbe", opacity: "Deckkraft:", texts: "📝 Texte (Autofill)", stTitle: "Titel", stDesc: "Beschreibung", stHint: "Tipp", btnStart: "START", btnRestart: "NEUSTART", prog: "Frage N von M", hit: "💥 Treffer", hitPerf: "Perfekt", hitGood: "Gut", hitWrong: "Falsch", hitMiss: "Daneben", combo: "KOMBO", fin: "🏆 Ränge & Ende", finWin: "Sieg", statRow: "Zusatz 'in Folge'", r1: "Rang 1", r2: "Rang 2", r3: "Rang 3", r4: "Rang 4", s1: "Perfekt", s2: "Gut", s3: "Fehler", s4: "Max Kombo", qSec: "❓ Fragen", addQ: "+ FRAGE", gen: "SPIEL GENERIEREN 🚀", del: "Löschen", qPh: "Frage eingeben...", oPh: "Option", cAns: "Richtige Antwort:", preview: "👁️ Vorschau", prevQ: "Beispielfrage...", prevA: "Option" },
+            game: { st: "WIE SPIELT MAN?", sd: "Der goldene Laser bewegt sich schnell. Drücke den Knopf (ODER LEERTASTE), wenn der Laser auf der richtigen Antwort ist!", sh: "Tipp: Antworte richtig, ohne zu verfehlen, um 🔥 KOMBO x2 und x3 zu aktivieren!", bs: "START!", br: "NOCHMAL SPIELEN", pr: "Frage", hp: "PERFEKT!", hg: "GUT!", hw: "FALSCH!", hm: "DANEBEN!", cmb: "KOMBO", fw: "SPIEL ABGESCHLOSSEN", sr: "in Folge", r1: "Anfänger", r2: "Experte", r3: "Meister!", r4: "LEGENDE!", s1: "Perfekt:", s2: "Gut:", s3: "Fehler:", s4: "Max Kombo:" }
         },
         fr: {
-            ui: { title: "🛠️ Créateur de Jeu", langSec: "🌐 Langue & Design", lang: "Langue", font: "Police", color: "Couleur", bg: "Panneau", opacity: "Opacité:", texts: "📝 Textes", stTitle: "Titre", stDesc: "Description", stHint: "Astuce", btnStart: "DÉMARRER", btnRestart: "REJOUER", prog: "Question N", hit: "💥 Impact & Rangs", hitPerf: "Parfait", hitGood: "Bien", hitWrong: "Erreur", hitMiss: "Raté", combo: "COMBO", finWin: "Victoire", statRow: "Suffixe 'de suite'", r1: "Rang 1", r2: "Rang 2", r3: "Rang 3", r4: "Rang 4", s1: "Parfait", s2: "Bien", s3: "Erreurs", s4: "Combo Max", qSec: "❓ Questions", addQ: "+ QUESTION", gen: "GÉNÉRER 🚀", del: "Supprimer", qPh: "Entrez la question...", oPh: "Option", cAns: "Bonne réponse:", preview: "👁️ Aperçu", prevQ: "Exemple de question...", prevA: "Option" },
-            game: { st: "COMMENT JOUER ?", sd: "Le laser doré se déplace rapidement. Appuyez sur le bouton (OU la barre <b>ESPACE</b>) quand le laser est sur la bonne réponse !", sh: "Astuce : Répondez correctement sans rater pour activer 🔥 COMBO x2 et x3 !", bs: "COMMENCER !", br: "REJOUER", pr: "Question", hp: "PARFAIT !", hg: "BIEN !", hw: "ERREUR !", hm: "RATÉ !", cmb: "COMBO", fw: "JEU TERMINÉ", sr: "de suite", r1: "Débutant", r2: "Expert", r3: "Maître !", r4: "LÉGENDE !", s1: "Parfait :", s2: "Bien :", s3: "Erreurs :", s4: "Combo Max :" }
+            ui: { title: "🛠️ Créateur de Jeu", langSec: "🌐 Langue & Design", lang: "Langue", font: "Police", color: "Couleur", bg: "Panneau", opacity: "Opacité:", texts: "📝 Textes (Auto-remplissage)", stTitle: "Titre", stDesc: "Description", stHint: "Astuce", btnStart: "DÉMARRER", btnRestart: "REJOUER", prog: "Question N", hit: "💥 Impact", hitPerf: "Parfait", hitGood: "Bien", hitWrong: "Erreur", hitMiss: "Raté", combo: "COMBO", fin: "🏆 Rangs & Fin", finWin: "Victoire", statRow: "Suffixe 'de suite'", r1: "Rang 1", r2: "Rang 2", r3: "Rang 3", r4: "Rang 4", s1: "Parfait", s2: "Bien", s3: "Erreurs", s4: "Combo Max", qSec: "❓ Questions", addQ: "+ QUESTION", gen: "GÉNÉRER 🚀", del: "Supprimer", qPh: "Entrez la question...", oPh: "Option", cAns: "Bonne réponse:", preview: "👁️ Aperçu", prevQ: "Exemple de question...", prevA: "Option" },
+            game: { st: "COMMENT JOUER ?", sd: "Le laser doré se déplace rapidement. Appuyez sur le bouton (OU ESPACE) quand le laser est sur la bonne réponse !", sh: "Astuce : Répondez correctement sans rater pour activer 🔥 COMBO x2 et x3 !", bs: "COMMENCER !", br: "REJOUER", pr: "Question", hp: "PARFAIT !", hg: "BIEN !", hw: "ERREUR !", hm: "RATÉ !", cmb: "COMBO", fw: "JEU TERMINÉ", sr: "de suite", r1: "Débutant", r2: "Expert", r3: "Maître !", r4: "LÉGENDE !", s1: "Parfait :", s2: "Bien :", s3: "Erreurs :", s4: "Combo Max :" }
         },
         it: {
-            ui: { title: "🛠️ Creatore di Giochi", langSec: "🌐 Lingua & Design", lang: "Lingua", font: "Carattere", color: "Colore", bg: "Pannello", opacity: "Opacità:", texts: "📝 Testi", stTitle: "Titolo", stDesc: "Descrizione", stHint: "Suggerimento", btnStart: "INIZIA", btnRestart: "RIGIOCA", prog: "Domanda N", hit: "💥 Impatto & Gradi", hitPerf: "Perfetto", hitGood: "Bene", hitWrong: "Errore", hitMiss: "Mancato", combo: "COMBO", finWin: "Vittoria", statRow: "Suffisso 'di fila'", r1: "Grado 1", r2: "Grado 2", r3: "Grado 3", r4: "Grado 4", s1: "Perfetto", s2: "Bene", s3: "Errori", s4: "Combo Max", qSec: "❓ Domande", addQ: "+ DOMANDA", gen: "GENERA 🚀", del: "Elimina", qPh: "Inserisci domanda...", oPh: "Opzione", cAns: "Risposta:", preview: "👁️ Anteprima", prevQ: "Esempio di domanda...", prevA: "Opzione" },
-            game: { st: "COME GIOCARE?", sd: "Il laser si muove velocemente. Premi il pulsante (O lo <b>SPAZIO</b>) quando il laser è sulla risposta corretta!", sh: "Suggerimento: Rispondi correttamente senza sbagliare per attivare 🔥 COMBO x2 e x3!", bs: "INIZIA!", br: "GIOCA ANCORA", pr: "Domanda", hp: "PERFETTO!", hg: "BENE!", hw: "ERRORE!", hm: "MANCATO!", cmb: "COMBO", fw: "GIOCO COMPLETATO", sr: "di fila", r1: "Principiante", r2: "Esperto", r3: "Maestro!", r4: "LEGGENDA!", s1: "Perfetto:", s2: "Bene:", s3: "Errori:", s4: "Combo Max:" }
+            ui: { title: "🛠️ Creatore di Giochi", langSec: "🌐 Lingua & Design", lang: "Lingua", font: "Carattere", color: "Colore", bg: "Pannello", opacity: "Opacità:", texts: "📝 Testi (Autocompletamento)", stTitle: "Titolo", stDesc: "Descrizione", stHint: "Suggerimento", btnStart: "INIZIA", btnRestart: "RIGIOCA", prog: "Domanda N", hit: "💥 Impatto", hitPerf: "Perfetto", hitGood: "Bene", hitWrong: "Errore", hitMiss: "Mancato", combo: "COMBO", fin: "🏆 Gradi & Fine", finWin: "Vittoria", statRow: "Suffisso 'di fila'", r1: "Grado 1", r2: "Grado 2", r3: "Grado 3", r4: "Grado 4", s1: "Perfetto", s2: "Bene", s3: "Errori", s4: "Combo Max", qSec: "❓ Domande", addQ: "+ DOMANDA", gen: "GENERA 🚀", del: "Elimina", qPh: "Inserisci domanda...", oPh: "Opzione", cAns: "Risposta:", preview: "👁️ Anteprima", prevQ: "Esempio di domanda...", prevA: "Opzione" },
+            game: { st: "COME GIOCARE?", sd: "Il laser si muove velocemente. Premi il pulsante (O SPAZIO) quando il laser è sulla risposta corretta!", sh: "Suggerimento: Rispondi correttamente senza sbagliare per attivare 🔥 COMBO x2 e x3!", bs: "INIZIA!", br: "GIOCA ANCORA", pr: "Domanda", hp: "PERFETTO!", hg: "BENE!", hw: "ERRORE!", hm: "MANCATO!", cmb: "COMBO", fw: "GIOCO COMPLETATO", sr: "di fila", r1: "Principiante", r2: "Esperto", r3: "Maestro!", r4: "LEGGENDA!", s1: "Perfetto:", s2: "Bene:", s3: "Errori:", s4: "Combo Max:" }
         },
         zh: {
-            ui: { title: "🛠️ 游戏生成器", langSec: "🌐 语言和设计", lang: "语言", font: "字体", color: "颜色", bg: "面板颜色", opacity: "不透明度:", texts: "📝 文本", stTitle: "标题", stDesc: "描述", stHint: "提示", btnStart: "开始", btnRestart: "重玩", prog: "第 N 题", hit: "💥 反馈与排名", hitPerf: "完美", hitGood: "不错", hitWrong: "错误", hitMiss: "未命中", combo: "连击", finWin: "胜利", statRow: "后缀 '连续'", r1: "排名 1", r2: "排名 2", r3: "排名 3", r4: "排名 4", s1: "完美", s2: "不错", s3: "错误", s4: "最大连击", qSec: "❓ 问题", addQ: "+ 问题", gen: "生成 🚀", del: "删除", qPh: "输入问题...", oPh: "选项", cAns: "答案:", preview: "👁️ 实时预览", prevQ: "示例问题...", prevA: "选项" },
-            game: { st: "怎么玩？", sd: "金色激光快速移动。当激光准确指向正确答案时，按下按钮（或<b>空格键</b>）！", sh: "提示：连续正确回答以激活 🔥 连击 x2 和 x3！", bs: "开始！", br: "再玩一次", pr: "问题", hp: "完美！", hg: "不错！", hw: "错误！", hm: "未命中！", cmb: "连击", fw: "游戏完成", sr: "连续", r1: "新手", r2: "专家", r3: "大师！", r4: "传奇！", s1: "完美:", s2: "不错:", s3: "错误:", s4: "最大连击:" }
+            ui: { title: "🛠️ 游戏生成器", langSec: "🌐 语言和设计", lang: "语言", font: "字体", color: "颜色", bg: "面板颜色", opacity: "不透明度:", texts: "📝 文本 (自动填充)", stTitle: "标题", stDesc: "描述", stHint: "提示", btnStart: "开始", btnRestart: "重玩", prog: "第 N 题", hit: "💥 反馈", hitPerf: "完美", hitGood: "不错", hitWrong: "错误", hitMiss: "未命中", combo: "连击", fin: "🏆 排名和结束", finWin: "胜利", statRow: "后缀 '连续'", r1: "排名 1", r2: "排名 2", r3: "排名 3", r4: "排名 4", s1: "完美", s2: "不错", s3: "错误", s4: "最大连击", qSec: "❓ 问题", addQ: "+ 问题", gen: "生成 🚀", del: "删除", qPh: "输入问题...", oPh: "选项", cAns: "答案:", preview: "👁️ 实时预览", prevQ: "示例问题...", prevA: "选项" },
+            game: { st: "怎么玩？", sd: "金色激光快速移动。当激光准确指向正确答案时，按下按钮（或空格键）！", sh: "提示：连续正确回答以激活 🔥 连击 x2 和 x3！", bs: "开始！", br: "再玩一次", pr: "问题", hp: "完美！", hg: "不错！", hw: "错误！", hm: "未命中！", cmb: "连击", fw: "游戏完成", sr: "连续", r1: "新手", r2: "专家", r3: "大师！", r4: "传奇！", s1: "完美:", s2: "不错:", s3: "错误:", s4: "最大连击:" }
         }
     };
 
     let questionCounter = 0;
     let currentLangData = i18n['ru'].ui; 
 
+    // Вспомогательная функция, чтобы безопасно вставлять текст в любые элементы
+    function setText(id, text) {
+        const el = document.getElementById(id);
+        if (el) {
+            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.value = text;
+            else el.innerText = text;
+        }
+    }
+
     function changeLanguage() {
         const lang = document.getElementById('lang-select').value;
-        const u = i18n[lang].ui; const g = i18n[lang].game;
+        const u = i18n[lang].ui; 
+        const g = i18n[lang].game;
         currentLangData = u; 
 
-        document.getElementById('lbl-title').innerText = u.title; document.getElementById('lbl-lang-sec').innerText = u.langSec;
-        document.getElementById('lbl-lang').innerText = u.lang; document.getElementById('lbl-font').innerText = u.font;
-        document.getElementById('lbl-color').innerText = u.color; document.getElementById('lbl-bg').innerText = u.bg;
-        document.getElementById('lbl-opacity').innerText = u.opacity; document.getElementById('lbl-texts-sec').innerText = u.texts;
-        document.getElementById('lbl-start-title').innerText = u.stTitle; document.getElementById('lbl-start-desc').innerText = u.stDesc;
-        document.getElementById('lbl-start-hint').innerText = u.stHint; document.getElementById('lbl-btn-start').innerText = u.btnStart; 
-        document.getElementById('lbl-btn-restart').innerText = u.btnRestart; document.getElementById('lbl-prog').innerText = u.prog; 
-        document.getElementById('lbl-hit-sec').innerText = u.hit; document.getElementById('lbl-hit-perf').innerText = u.hitPerf; 
-        document.getElementById('lbl-hit-good').innerText = u.hitGood; document.getElementById('lbl-hit-wrong').innerText = u.hitWrong; 
-        document.getElementById('lbl-hit-miss').innerText = u.hitMiss; document.getElementById('lbl-combo').innerText = u.combo; 
-        document.getElementById('lbl-fin-win').innerText = u.finWin; document.getElementById('lbl-stat-row').innerText = u.statRow;
-        
-        document.getElementById('lbl-r1').innerText = u.r1; document.getElementById('lbl-r2').innerText = u.r2;
-        document.getElementById('lbl-r3').innerText = u.r3; document.getElementById('lbl-r4').innerText = u.r4;
+        // 1. Переводим сами подписи (Label) в редакторе
+        setText('lbl-title', u.title); setText('lbl-lang-sec', u.langSec);
+        setText('lbl-lang', u.lang); setText('lbl-font', u.font);
+        setText('lbl-color', u.color); setText('lbl-bg', u.bg);
+        setText('lbl-opacity', u.opacity); setText('lbl-texts-sec', u.texts);
+        setText('lbl-start-title', u.stTitle); setText('lbl-start-desc', u.stDesc);
+        setText('lbl-start-hint', u.stHint); setText('lbl-btn-start', u.btnStart);
+        setText('lbl-btn-restart', u.btnRestart); setText('lbl-prog', u.prog);
+        setText('lbl-hit-sec', u.hit); setText('lbl-hit-perf', u.hitPerf);
+        setText('lbl-hit-good', u.hitGood); setText('lbl-hit-wrong', u.hitWrong);
+        setText('lbl-hit-miss', u.hitMiss); setText('lbl-combo', u.combo);
+        setText('lbl-fin-sec', u.fin); setText('lbl-fin-win', u.finWin);
+        setText('lbl-stat-row', u.statRow); setText('lbl-r1', u.r1);
+        setText('lbl-r2', u.r2); setText('lbl-r3', u.r3);
+        setText('lbl-r4', u.r4); setText('lbl-s1', u.s1);
+        setText('lbl-s2', u.s2); setText('lbl-s3', u.s3);
+        setText('lbl-s4', u.s4); setText('lbl-q-sec', u.qSec);
+        setText('btn-add-q', u.addQ); setText('btn-gen', u.gen);
+        setText('lbl-preview', u.preview);
 
-        document.getElementById('lbl-s1').innerText = u.s1; document.getElementById('lbl-s2').innerText = u.s2;
-        document.getElementById('lbl-s3').innerText = u.s3; document.getElementById('lbl-s4').innerText = u.s4;
-        document.getElementById('lbl-q-sec').innerText = u.qSec; document.getElementById('btn-add-q').innerText = u.addQ;
-        document.getElementById('btn-gen').innerText = u.gen;
-        document.getElementById('lbl-preview').innerText = u.preview;
+        // 2. ИДЕАЛЬНОЕ АВТОЗАПОЛНЕНИЕ ПОЛЕЙ (То, что пойдет в игру)
+        setText('t-start-title', g.st); setText('t-start-desc', g.sd);
+        setText('t-start-hint', g.sh); setText('t-btn-start', g.bs);
+        setText('t-btn-restart', g.br); setText('t-progress', g.pr);
+        setText('t-hit-perfect', g.hp); setText('t-hit-good', g.hg);
+        setText('t-hit-wrong', g.hw); setText('t-hit-miss', g.hm);
+        setText('t-combo', g.cmb); setText('t-fin-win', g.fw);
+        setText('t-stat-row', g.sr); setText('t-rank-1', g.r1);
+        setText('t-rank-2', g.r2); setText('t-rank-3', g.r3);
+        setText('t-rank-4', g.r4); setText('t-stat-1', g.s1);
+        setText('t-stat-2', g.s2); setText('t-stat-3', g.s3);
+        setText('t-stat-4', g.s4);
 
-        // Заполнение инпутов
-        document.getElementById('t-start-title').value = g.st; document.getElementById('t-start-desc').value = g.sd;
-        document.getElementById('t-start-hint').value = g.sh; document.getElementById('t-btn-start').value = g.bs; 
-        document.getElementById('t-btn-restart').value = g.br; document.getElementById('t-progress').value = g.pr; 
-        document.getElementById('t-hit-perfect').value = g.hp; document.getElementById('t-hit-good').value = g.hg; 
-        document.getElementById('t-hit-wrong').value = g.hw; document.getElementById('t-hit-miss').value = g.hm; 
-        document.getElementById('t-combo').value = g.cmb; document.getElementById('t-fin-win').value = g.fw; 
-        document.getElementById('t-stat-row').value = g.sr;
-        
-        document.getElementById('t-rank-1').value = g.r1; document.getElementById('t-rank-2').value = g.r2;
-        document.getElementById('t-rank-3').value = g.r3; document.getElementById('t-rank-4').value = g.r4;
-
-        document.getElementById('t-stat-1').value = g.s1; document.getElementById('t-stat-2').value = g.s2;
-        document.getElementById('t-stat-3').value = g.s3; document.getElementById('t-stat-4').value = g.s4;
-
+        // 3. Обновляем плейсхолдеры внутри блоков с вопросами
         document.querySelectorAll('.question-block').forEach((b, idx) => {
             b.querySelector('h4').innerText = `${u.qSec.split(' ')[0]} ${idx + 1}`;
             b.querySelector('.remove-btn').innerText = u.del;
@@ -263,7 +265,8 @@
             b.querySelector('.q-opt-0').placeholder = `${u.oPh} 1`;
             b.querySelector('.q-opt-1').placeholder = `${u.oPh} 2`;
             b.querySelector('.q-opt-2').placeholder = `${u.oPh} 3`;
-            const s = b.querySelector('.correct-select'); const v = s.value;
+            const s = b.querySelector('.correct-select'); 
+            const v = s.value;
             s.options[0].text = `${u.cAns} 1`; s.options[1].text = `${u.cAns} 2`; s.options[2].text = `${u.cAns} 3`;
             s.value = v;
         });
@@ -284,7 +287,6 @@
         return r ? `${parseInt(r[1], 16)}, ${parseInt(r[2], 16)}, ${parseInt(r[3], 16)}` : "255, 255, 255";
     }
 
-    // ЛОГИКА ЖИВОГО ПРЕДПРОСМОТРА
     function updatePreview() {
         const font = document.getElementById('cfg-font').value;
         const color = document.getElementById('cfg-color').value;
@@ -296,14 +298,10 @@
         previewBox.style.fontFamily = font;
 
         const qBox = document.getElementById('prev-q');
-        qBox.style.color = color;
-        qBox.style.backgroundColor = bgColor;
+        qBox.style.color = color; qBox.style.backgroundColor = bgColor;
 
         const aBoxes = document.querySelectorAll('.prev-a');
-        aBoxes.forEach(b => {
-            b.style.color = color;
-            b.style.backgroundColor = bgColor;
-        });
+        aBoxes.forEach(b => { b.style.color = color; b.style.backgroundColor = bgColor; });
 
         const firstQ = document.querySelector('.q-text');
         const firstO0 = document.querySelector('.q-opt-0');
@@ -315,6 +313,11 @@
         aBoxes[1].innerText = (firstO1 && firstO1.value) ? firstO1.value : `${currentLangData.prevA} 2`;
         aBoxes[2].innerText = (firstO2 && firstO2.value) ? firstO2.value : `${currentLangData.prevA} 3`;
     }
+
+    document.addEventListener('input', (e) => {
+        if(['cfg-font', 'cfg-color', 'cfg-bg', 'cfg-opacity'].includes(e.target.id)) updatePreview();
+    });
+    document.getElementById('cfg-font').addEventListener('change', updatePreview);
 
     function generateLink() {
         const qBlocks = document.querySelectorAll('.question-block');
