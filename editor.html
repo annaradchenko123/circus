@@ -11,6 +11,7 @@
         .container { max-width: 1300px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
         h1 { text-align: center; color: #2c3e50; margin-top: 0; border-bottom: 2px solid #ecf0f1; padding-bottom: 15px; }
         
+        /* ДВУХКОЛОНОЧНЫЙ МАКЕТ */
         .main-layout { display: flex; gap: 40px; align-items: flex-start; margin-top: 20px; }
         .left-col { flex: 1; min-width: 0; }
         .right-col { width: 380px; position: sticky; top: 20px; flex-shrink: 0; }
@@ -92,7 +93,7 @@
                     </div>
                     <div class="col">
                         <label id="lbl-font">Шрифт игры</label>
-                        <select id="cfg-font">
+                        <select id="cfg-font" onchange="updatePreview()">
                             <option value="'Ubuntu', sans-serif">Ubuntu</option>
                             <option value="'Montserrat', sans-serif">Montserrat</option>
                             <option value="'Comic Sans MS', cursive">Comic Sans</option>
@@ -102,9 +103,9 @@
                 </div>
                 <br>
                 <div class="row">
-                    <div class="col"><label id="lbl-color">Цвет текста</label><input type="color" id="cfg-color" value="#2c3e50"></div>
-                    <div class="col"><label id="lbl-bg">Цвет плашек</label><input type="color" id="cfg-bg" value="#ffffff"></div>
-                    <div class="col"><label><span id="lbl-opacity">Прозрачность:</span> <span id="opacity-val">95</span>%</label><input type="range" id="cfg-opacity" min="50" max="100" value="95" oninput="document.getElementById('opacity-val').innerText = this.value"></div>
+                    <div class="col"><label id="lbl-color">Цвет текста</label><input type="color" id="cfg-color" value="#2c3e50" oninput="updatePreview()"></div>
+                    <div class="col"><label id="lbl-bg">Цвет плашек</label><input type="color" id="cfg-bg" value="#ffffff" oninput="updatePreview()"></div>
+                    <div class="col"><label><span id="lbl-opacity">Прозрачность:</span> <span id="opacity-val">95</span>%</label><input type="range" id="cfg-opacity" min="50" max="100" value="95" oninput="document.getElementById('opacity-val').innerText = this.value; updatePreview();"></div>
                 </div>
             </div>
 
@@ -212,12 +213,12 @@
     };
 
     let questionCounter = 0;
-    let currentLangData = i18n['ru']; // Глобальная переменная для превью
+    let currentLangData = i18n['ru'].ui; 
 
     function changeLanguage() {
         const lang = document.getElementById('lang-select').value;
         const u = i18n[lang].ui; const g = i18n[lang].game;
-        currentLangData = u; // сохраняем для предпросмотра
+        currentLangData = u; 
 
         document.getElementById('lbl-title').innerText = u.title; document.getElementById('lbl-lang-sec').innerText = u.langSec;
         document.getElementById('lbl-lang').innerText = u.lang; document.getElementById('lbl-font').innerText = u.font;
@@ -229,8 +230,7 @@
         document.getElementById('lbl-hit-sec').innerText = u.hit; document.getElementById('lbl-hit-perf').innerText = u.hitPerf; 
         document.getElementById('lbl-hit-good').innerText = u.hitGood; document.getElementById('lbl-hit-wrong').innerText = u.hitWrong; 
         document.getElementById('lbl-hit-miss').innerText = u.hitMiss; document.getElementById('lbl-combo').innerText = u.combo; 
-        document.getElementById('lbl-fin-sec').innerText = u.hit; document.getElementById('lbl-fin-win').innerText = u.finWin; 
-        document.getElementById('lbl-stat-row').innerText = u.statRow;
+        document.getElementById('lbl-fin-win').innerText = u.finWin; document.getElementById('lbl-stat-row').innerText = u.statRow;
         
         document.getElementById('lbl-r1').innerText = u.r1; document.getElementById('lbl-r2').innerText = u.r2;
         document.getElementById('lbl-r3').innerText = u.r3; document.getElementById('lbl-r4').innerText = u.r4;
@@ -241,6 +241,7 @@
         document.getElementById('btn-gen').innerText = u.gen;
         document.getElementById('lbl-preview').innerText = u.preview;
 
+        // Заполнение инпутов
         document.getElementById('t-start-title').value = g.st; document.getElementById('t-start-desc').value = g.sd;
         document.getElementById('t-start-hint').value = g.sh; document.getElementById('t-btn-start').value = g.bs; 
         document.getElementById('t-btn-restart').value = g.br; document.getElementById('t-progress').value = g.pr; 
@@ -304,7 +305,6 @@
             b.style.backgroundColor = bgColor;
         });
 
-        // Берем текст из ПЕРВОГО вопроса, если он есть
         const firstQ = document.querySelector('.q-text');
         const firstO0 = document.querySelector('.q-opt-0');
         const firstO1 = document.querySelector('.q-opt-1');
@@ -315,14 +315,6 @@
         aBoxes[1].innerText = (firstO1 && firstO1.value) ? firstO1.value : `${currentLangData.prevA} 2`;
         aBoxes[2].innerText = (firstO2 && firstO2.value) ? firstO2.value : `${currentLangData.prevA} 3`;
     }
-
-    // Слушатели для обновления превью при любом изменении
-    document.addEventListener('input', (e) => {
-        if(['cfg-font', 'cfg-color', 'cfg-bg', 'cfg-opacity'].includes(e.target.id)) {
-            updatePreview();
-        }
-    });
-    document.getElementById('cfg-font').addEventListener('change', updatePreview);
 
     function generateLink() {
         const qBlocks = document.querySelectorAll('.question-block');
