@@ -260,4 +260,260 @@
 
     function alignAnswers() { const trackRect = ui.track.getBoundingClientRect(); const rightPanelRect = document.getElementById('right-panel').getBoundingClientRect(); ui.answersBox.style.top = (trackRect.top - rightPanelRect.top) + 'px'; ui.answersBox.style.height = trackRect.height + 'px'; }
     window.addEventListener('resize', alignAnswers);
-    ui.startBtn.addEventListener('click', () => { if(audioCtx.state === 'suspended') audioCtx.resume(); bgMusic.play().catch(e=>console.log(e)); ui.startScreen.style
+    ui.startBtn.addEventListener('click', () => { if(audioCtx.state === 'suspended') audioCtx.resume(); bgMusic.play().catch(e=>console.log(e)); ui.startScreen.style.opacity = '0'; setTimeout(() => { ui.startScreen.style.display = 'none'; initGame(); }, 300); });
+    window.addEventListener('keydown', (e) => { if (e.code === 'Space') { e.preventDefault(); if (!ui.btn.disabled && isPlaying) { ui.btn.classList.add('pressed'); handleHit(); } } });
+    window.addEventListener('keyup', (e) => { if (e.code === 'Space') ui.btn.classList.remove('pressed'); });
+    ui.btn.addEventListener('mousedown', (e) => { if (!ui.btn.disabled && isPlaying) handleHit(e); });
+    ui.btn.addEventListener('touchstart', (e) => { if (!ui.btn.disabled && isPlaying) handleHit(e); }, { passive: false });
+
+    function initGame() { currentQ = 0; score = 0; comboCount = 0; comboMultiplier = 1; lives = 3; gameStats = { p:0, g:0, w:0, m:0 }; updateLives(); ui.score.classList.remove('combo-active'); ui.score.innerText = "0"; bgMusic.volume = 0.2; ui.finalScreen.style.display = 'none'; loadQuestion(); }
+    function updateLives() { for (let i=1; i<=3; i++) { const h = document.getElementById(`life-${i}`); i<=lives ? h.classList.remove('lost') : h.classList.add('lost'); } }
+
+    function loadQuestion() {
+        if (currentQ >= GAME_CFG.questions.length) { endGame(false); return; }
+        const qD = GAME_CFG.questions[currentQ]; ui.progNum.innerText = currentQ + 1; ui.progBar.style.width = `${(currentQ / GAME_CFG.questions.length) * 100}%`; ui.question.innerText = qD.q; ui.answersBox.innerHTML = ''; alignAnswers();
+        qD.opt.forEach((opt, idx) => { const d = document.createElement('div'); d.className = 'answer-slot'; d.innerText = opt; d.dataset.index = idx; ui.answersBox.appendChild(d); });
+        ui.btn.disabled = false; ui.feedback.style.opacity = '0'; ui.feedback.style.backdropFilter = 'none'; laserY = 0; direction = 1; ui.slider.style.top = (laserY - (ui.slider.clientHeight / 2)) + 'px'; isPlaying = true; animateSlider();
+    }
+
+    function animateSlider() { if (!isPlaying) return; const th = ui.track.clientHeight; laserY += sliderSpeed * direction; if (laserY >= th) { laserY = th; direction = -1; } else if (laserY <= 0) { laserY = 0; direction = 1; } ui.slider.style.top = (laserY - (ui.slider.clientHeight / 2)) + 'px'; animId = requestAnimationFrame(animateSlider); }
+    function handleHit(e) { if(e) e.preventDefault(); if (!isPlaying) return; ui.machine.classList.remove('shake-effect'); void ui.machine.offsetWidth; ui.machine.classList.add('shake-effect'); playSound('hit'); isPlaying = false; cancelAnimationFrame(animId); ui.btn.disabled = true; checkHit(); }
+
+    function checkHit() {
+        const tr = ui.track.getBoundingClientRect(); const absY = tr.top + laserY; const slots = document.querySelectorAll('.answer-slot'); let hId = -1, acc = 0;
+        slots.forEach((sl, idx) => { const r = sl.getBoundingClientRect(); if (absY >= r.top && absY <= r.bottom) { hId = idx; const c = r.top + (r.height/2); acc = 1 - (Math.abs(c - absY) / (r.height/2)); } });
+        processResult(hId, acc);
+    }
+
+    function processResult(hId, acc) {
+        const cId = GAME_CFG.questions[currentQ].c; let pts = 0, msg = "", col = "", isC = (hId === parseInt(cId)), isP = (isC && acc > 0.6); const slots = document.querySelectorAll('.answer-slot');
+        ui.machine.classList.remove('shake-effect', 'epic-shake-effect'); void ui.machine.offsetWidth; 
+        if (isP) { ui.machine.classList.add('epic-shake-effect'); ui.hitFlash.style.opacity = '0.8'; setTimeout(() => ui.hitFlash.style.opacity = '0', 80); if (hId !== -1) slots[hId].classList.add('card-epic-smash-anim'); } 
+        else { ui.machine.classList.add('shake-effect'); if (hId !== -1) slots[hId].classList.add('card-smash-anim'); }
+        if (isC) { comboCount++; gameStats.m = Math.max(gameStats.m, comboCount); comboMultiplier = Math.min(comboCount, 3); } else { comboCount = 0; comboMultiplier = 1; lives--; updateLives(); }
+        if (hId === -1) { pts = -50; msg = GAME_CFG.texts.hitMiss; col = "#bdc3c7"; gameStats.w++; playSound('error'); } 
+        else if (isC) { slots[hId].style.borderColor = "#2ecc71"; slots[hId].style.backgroundColor = "#e8f8f5"; playSound('success'); fireConfetti(); 
+            if (isP) { pts = 100 * comboMultiplier; msg = GAME_CFG.texts.hitPerf; col = "#2ecc71"; gameStats.p++; } else { pts = 70 * comboMultiplier; msg = GAME_CFG.texts.hitGood; col = "#f1c40f"; gameStats.g++; }
+        } else { slots[hId].style.borderColor = "#e74c3c"; slots[hId].style.backgroundColor = "#fdedec"; pts = -80; msg = GAME_CFG.texts.hitWrong; col = "#e74c3c"; gameStats.w++; playSound('error'); }
+
+        ui.fText.innerText = msg; ui.fText.style.color = col; ui.fPoints.innerText = pts > 0 ? `+${pts}` : pts; ui.fPoints.style.color = col;
+        if (comboCount >= 2) { ui.fCombo.innerText = `🔥 ${GAME_CFG.texts.combo} x${comboMultiplier} 🔥`; ui.fCombo.style.display = 'block'; ui.score.classList.add('combo-active'); } 
+        else { ui.fCombo.style.display = 'none'; ui.score.classList.remove('combo-active'); }
+        ui.feedback.style.opacity = '1'; ui.feedback.style.backdropFilter = 'blur(3px)'; updateScore(pts);
+        setTimeout(() => { currentQ++; if (lives <= 0) endGame(true); else loadQuestion(); }, 2000); 
+    }
+
+    function animateScore(s, e, d) { let sT = null; const step = (t) => { if (!sT) sT = t; const p = Math.min((t - sT) / d, 1); ui.score.innerText = Math.floor(s + (e - s) * (p * (2 - p))); p < 1 ? requestAnimationFrame(step) : ui.score.innerText = e; }; requestAnimationFrame(step); }
+    function updateScore(pts) { const old = score; score = Math.max(0, score + pts); if(pts !== 0) { if (!ui.score.classList.contains('combo-active')) { ui.score.classList.add('score-anim'); setTimeout(()=>ui.score.classList.remove('score-anim'), 300); } animateScore(old, score, 1000); } }
+    function fireConfetti() { confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 }, colors: ['#ffd700', '#f1c40f', '#2ecc71', '#3498db'] }); }
+
+    function endGame(isDeath) {
+        bgMusic.volume = 0.02; ui.progBar.style.width = '100%'; ui.finalScreen.style.display = 'flex'; ui.finalScore.innerText = score; ui.score.classList.remove('combo-active'); 
+        if (isDeath) { ui.finalTitle.innerText = GAME_CFG.texts.finLose; ui.finalTitle.style.color = "#ff7979"; } 
+        else { ui.finalTitle.innerText = GAME_CFG.texts.finWin; ui.finalTitle.style.color = "#fff"; fireConfetti(); setTimeout(fireConfetti, 500); }
+        ui.statP.innerText = gameStats.p; ui.statG.innerText = gameStats.g; ui.statW.innerText = gameStats.w;
+        let mM = Math.min(gameStats.m, 3); ui.statM.innerText = gameStats.m > 1 ? `x${mM} (${gameStats.m} ${GAME_CFG.texts.statRow})` : "x1";
+    }
+    alignAnswers();
+<\/script>
+</body>
+</html>
+</template>
+
+<!-- СКРИПТЫ РЕДАКТОРА (МНОГОЯЗЫЧНОСТЬ И ЛОГИКА) -->
+<script>
+    const langs = {
+        ru: {
+            ui: {
+                title: "🛠️ Конструктор Силомера", lang: "🌐 Язык интерфейса", design: "🎨 Дизайн и Шрифты",
+                font: "Шрифт", color: "Цвет текста", bg: "Цвет плашек", opacity: "Прозрачность:",
+                texts: "📝 Тексты интерфейса", st: "Стартовый экран: Заголовок", sd: "Стартовый экран: Описание",
+                bs: "Кнопка СТАРТ", br: "Кнопка РЕСТАРТ", pr: "Текст: Вопрос N из M",
+                hit: "💥 Тексты реакции на удар", hp: "Идеально", hg: "Отлично", hw: "Ошибка", hm: "Промах", cmb: "Слово: КОМБО",
+                fin: "🏆 Финальный экран", fw: "Победа", fl: "Поражение",
+                s1: "Статистика: Идеально", s2: "Отлично", s3: "Ошибки", s4: "Макс Комбо", sr: "Приписка 'подряд'",
+                qsec: "❓ Вопросы и ответы", addQ: "+ ДОБАВИТЬ ВОПРОС", genBtn: "СГЕНЕРИРОВАТЬ КОД 🚀",
+                qPh: "Текст вопроса...", optPh: "Вариант", curCor: "Правильный ответ:", delBtn: "Удалить"
+            },
+            game: {
+                st: "КАК ИГРАТЬ?", sd: "Золотой лазер быстро бегает вверх и вниз. Нажмите на кнопку (ИЛИ на ПРОБЕЛ), когда лазер окажется ровно на правильном ответе!",
+                bs: "НАЧАТЬ!", br: "ИГРАТЬ СНОВА", pr: "Вопрос", hp: "ИДЕАЛЬНО!", hg: "ОТЛИЧНО!", hw: "ОШИБКА!", hm: "ПРОМАХ!",
+                cmb: "КОМБО", fw: "ИГРА ЗАВЕРШЕНА", fl: "ПОТРАЧЕНО", s1: "Идеально:", s2: "Отлично:", s3: "Ошибки:", s4: "Макс. Комбо:", sr: "подряд"
+            }
+        },
+        en: {
+            ui: { title: "🛠️ Arcade Game Maker", lang: "🌐 Interface Language", design: "🎨 Design & Fonts", font: "Font", color: "Text Color", bg: "Panel Color", opacity: "Opacity:", texts: "📝 Interface Texts", st: "Start Title", sd: "Start Description", bs: "START Button", br: "RESTART Button", pr: "Text: Question N of M", hit: "💥 Hit Feedback Texts", hp: "Perfect", hg: "Good", hw: "Wrong", hm: "Miss", cmb: "Word: COMBO", fin: "🏆 Final Screen", fw: "Victory", fl: "Defeat", s1: "Stats: Perfect", s2: "Good", s3: "Mistakes", s4: "Max Combo", sr: "Suffix 'in a row'", qsec: "❓ Questions & Answers", addQ: "+ ADD QUESTION", genBtn: "GENERATE CODE 🚀", qPh: "Question text...", optPh: "Option", curCor: "Correct answer:", delBtn: "Delete" },
+            game: { st: "HOW TO PLAY?", sd: "The golden laser moves fast up and down. Hit the button (OR press SPACE) exactly when the laser is on the correct answer!", bs: "START!", br: "PLAY AGAIN", pr: "Question", hp: "PERFECT!", hg: "GOOD!", hw: "WRONG!", hm: "MISS!", cmb: "COMBO", fw: "GAME COMPLETED", fl: "GAME OVER", s1: "Perfect:", s2: "Good:", s3: "Mistakes:", s4: "Max Combo:", sr: "in a row" }
+        },
+        es: {
+            ui: { title: "🛠️ Creador de Juegos", lang: "🌐 Idioma", design: "🎨 Diseño", font: "Fuente", color: "Color de texto", bg: "Color de panel", opacity: "Opacidad:", texts: "📝 Textos de interfaz", st: "Título de inicio", sd: "Descripción", bs: "Botón INICIO", br: "Botón REINICIAR", pr: "Pregunta N de M", hit: "💥 Textos de impacto", hp: "Perfecto", hg: "Bien", hw: "Error", hm: "Fallo", cmb: "Palabra: COMBO", fin: "🏆 Pantalla Final", fw: "Victoria", fl: "Derrota", s1: "Perfecto", s2: "Bien", s3: "Errores", s4: "Combo Máx", sr: "Sufijo 'seguidos'", qsec: "❓ Preguntas y Respuestas", addQ: "+ AÑADIR PREGUNTA", genBtn: "GENERAR CÓDIGO 🚀", qPh: "Texto de la pregunta...", optPh: "Opción", curCor: "Respuesta correcta:", delBtn: "Eliminar" },
+            game: { st: "¿CÓMO JUGAR?", sd: "El láser dorado se mueve rápido. ¡Presiona el botón exactamente cuando el láser esté en la respuesta correcta!", bs: "¡EMPEZAR!", br: "VOLVER A JUGAR", pr: "Pregunta", hp: "¡PERFECTO!", hg: "¡BIEN!", hw: "¡ERROR!", hm: "¡FALLO!", cmb: "COMBO", fw: "JUEGO COMPLETADO", fl: "JUEGO TERMINADO", s1: "Perfecto:", s2: "Bien:", s3: "Errores:", s4: "Combo Máx:", sr: "seguidos" }
+        },
+        de: {
+            ui: { title: "🛠️ Spiel-Generator", lang: "🌐 Sprache", design: "🎨 Design", font: "Schriftart", color: "Textfarbe", bg: "Panel-Farbe", opacity: "Deckkraft:", texts: "📝 Texte", st: "Start Titel", sd: "Start Beschreibung", bs: "START Button", br: "NEUSTART Button", pr: "Frage N von M", hit: "💥 Treffer-Texte", hp: "Perfekt", hg: "Gut", hw: "Falsch", hm: "Daneben", cmb: "Wort: KOMBO", fin: "🏆 Endbildschirm", fw: "Sieg", fl: "Niederlage", s1: "Perfekt", s2: "Gut", s3: "Fehler", s4: "Max Kombo", sr: "Zusatz 'in Folge'", qsec: "❓ Fragen", addQ: "+ FRAGE HINZUFÜGEN", genBtn: "CODE GENERIEREN 🚀", qPh: "Fragentext...", optPh: "Option", curCor: "Richtige Antwort:", delBtn: "Löschen" },
+            game: { st: "WIE SPIELT MAN?", sd: "Der goldene Laser bewegt sich schnell. Drücke den Knopf genau dann, wenn der Laser auf der richtigen Antwort ist!", bs: "START!", br: "NOCHMAL SPIELEN", pr: "Frage", hp: "PERFEKT!", hg: "GUT!", hw: "FALSCH!", hm: "DANEBEN!", cmb: "KOMBO", fw: "SPIEL ABGESCHLOSSEN", fl: "SPIEL VORBEI", s1: "Perfekt:", s2: "Gut:", s3: "Fehler:", s4: "Max Kombo:", sr: "in Folge" }
+        },
+        fr: {
+            ui: { title: "🛠️ Créateur de Jeu", lang: "🌐 Langue", design: "🎨 Design", font: "Police", color: "Couleur texte", bg: "Couleur panneau", opacity: "Opacité:", texts: "📝 Textes d'interface", st: "Titre Accueil", sd: "Description", bs: "Bouton DÉMARRER", br: "Bouton REJOUER", pr: "Question N sur M", hit: "💥 Textes d'impact", hp: "Parfait", hg: "Bien", hw: "Erreur", hm: "Raté", cmb: "Mot : COMBO", fin: "🏆 Écran final", fw: "Victoire", fl: "Défaite", s1: "Parfait", s2: "Bien", s3: "Erreurs", s4: "Combo Max", sr: "Suffixe 'de suite'", qsec: "❓ Questions", addQ: "+ AJOUTER QUESTION", genBtn: "GÉNÉRER LE CODE 🚀", qPh: "Texte de la question...", optPh: "Option", curCor: "Bonne réponse:", delBtn: "Supprimer" },
+            game: { st: "COMMENT JOUER ?", sd: "Le laser doré se déplace rapidement. Appuyez sur le bouton quand le laser est sur la bonne réponse !", bs: "COMMENCER !", br: "REJOUER", pr: "Question", hp: "PARFAIT !", hg: "BIEN !", hw: "ERREUR !", hm: "RATÉ !", cmb: "COMBO", fw: "JEU TERMINÉ", fl: "PARTIE PERDUE", s1: "Parfait :", s2: "Bien :", s3: "Erreurs :", s4: "Combo Max :", sr: "de suite" }
+        },
+        it: {
+            ui: { title: "🛠️ Creatore di Giochi", lang: "🌐 Lingua", design: "🎨 Design", font: "Carattere", color: "Colore testo", bg: "Colore pannelli", opacity: "Opacità:", texts: "📝 Testi interfaccia", st: "Titolo Iniziale", sd: "Descrizione", bs: "Pulsante INIZIA", br: "Pulsante RIGIOCA", pr: "Domanda N di M", hit: "💥 Testi di impatto", hp: "Perfetto", hg: "Bene", hw: "Errore", hm: "Mancato", cmb: "Parola: COMBO", fin: "🏆 Schermata Finale", fw: "Vittoria", fl: "Sconfitta", s1: "Perfetto", s2: "Bene", s3: "Errori", s4: "Combo Max", sr: "Suffisso 'di fila'", qsec: "❓ Domande e Risposte", addQ: "+ AGGIUNGI DOMANDA", genBtn: "GENERA CODICE 🚀", qPh: "Testo della domanda...", optPh: "Opzione", curCor: "Risposta corretta:", delBtn: "Elimina" },
+            game: { st: "COME GIOCARE?", sd: "Il laser dorato si muove velocemente. Premi il pulsante esattamente quando il laser è sulla risposta corretta!", bs: "INIZIA!", br: "GIOCA ANCORA", pr: "Domanda", hp: "PERFETTO!", hg: "BENE!", hw: "ERRORE!", hm: "MANCATO!", cmb: "COMBO", fw: "GIOCO COMPLETATO", fl: "GAME OVER", s1: "Perfetto:", s2: "Bene:", s3: "Errori:", s4: "Combo Max:", sr: "di fila" }
+        },
+        zh: {
+            ui: { title: "🛠️ 街机游戏生成器", lang: "🌐 界面语言", design: "🎨 设计与字体", font: "字体", color: "文本颜色", bg: "面板颜色", opacity: "不透明度:", texts: "📝 界面文本", st: "开始屏幕：标题", sd: "开始屏幕：描述", bs: "开始按钮", br: "重新开始按钮", pr: "文本：第 N 个问题", hit: "💥 命中反馈文本", hp: "完美", hg: "不错", hw: "错误", hm: "未命中", cmb: "词语：连击", fin: "🏆 最终屏幕", fw: "胜利", fl: "失败", s1: "统计：完美", s2: "不错", s3: "错误", s4: "最大连击", sr: "后缀 '连续'", qsec: "❓ 问题与答案", addQ: "+ 添加问题", genBtn: "生成代码 🚀", qPh: "问题文本...", optPh: "选项", curCor: "正确答案:", delBtn: "删除" },
+            game: { st: "怎么玩？", sd: "金色激光快速上下移动。当激光准确指向正确答案时，按下按钮！", bs: "开始！", br: "再玩一次", pr: "问题", hp: "完美！", hg: "不错！", hw: "错误！", hm: "未击中！", cmb: "连击", fw: "游戏完成", fl: "游戏结束", s1: "完美:", s2: "不错:", s3: "错误:", s4: "最大连击:", sr: "连续" }
+        }
+    };
+
+    let qCount = 0;
+
+    function applyLangPreset() {
+        const langKey = document.getElementById('lang-select').value;
+        const uiText = langs[langKey].ui;
+        const gText = langs[langKey].game;
+
+        // 1. Перевод UI редактора
+        document.getElementById('ui-title').innerText = uiText.title; document.getElementById('ui-h-lang').innerText = uiText.lang;
+        document.getElementById('ui-h-design').innerText = uiText.design; document.getElementById('ui-l-font').innerText = uiText.font;
+        document.getElementById('ui-l-color').innerText = uiText.color; document.getElementById('ui-l-bg').innerText = uiText.bg;
+        document.getElementById('ui-l-opacity').innerText = uiText.opacity; document.getElementById('ui-h-texts').innerText = uiText.texts;
+        document.getElementById('ui-l-st').innerText = uiText.st; document.getElementById('ui-l-sd').innerText = uiText.sd;
+        document.getElementById('ui-l-bs').innerText = uiText.bs; document.getElementById('ui-l-br').innerText = uiText.br;
+        document.getElementById('ui-l-pr').innerText = uiText.pr; document.getElementById('ui-h-hit').innerText = uiText.hit;
+        document.getElementById('ui-l-hp').innerText = uiText.hp; document.getElementById('ui-l-hg').innerText = uiText.hg;
+        document.getElementById('ui-l-hw').innerText = uiText.hw; document.getElementById('ui-l-hm').innerText = uiText.hm;
+        document.getElementById('ui-l-cmb').innerText = uiText.cmb; document.getElementById('ui-h-fin').innerText = uiText.fin;
+        document.getElementById('ui-l-fw').innerText = uiText.fw; document.getElementById('ui-l-fl').innerText = uiText.fl;
+        document.getElementById('ui-l-s1').innerText = uiText.s1; document.getElementById('ui-l-s2').innerText = uiText.s2;
+        document.getElementById('ui-l-s3').innerText = uiText.s3; document.getElementById('ui-l-s4').innerText = uiText.s4;
+        document.getElementById('ui-l-sr').innerText = uiText.sr; document.getElementById('ui-h-qsec').innerText = uiText.qsec;
+        document.getElementById('ui-btn-add').innerText = uiText.addQ; document.getElementById('ui-btn-gen').innerText = uiText.genBtn;
+
+        // 2. Установка игровых фраз в инпуты
+        document.getElementById('t-start-title').value = gText.st; document.getElementById('t-start-desc').value = gText.sd;
+        document.getElementById('t-btn-start').value = gText.bs; document.getElementById('t-btn-restart').value = gText.br;
+        document.getElementById('t-progress').value = gText.pr; document.getElementById('t-hit-perfect').value = gText.hp;
+        document.getElementById('t-hit-good').value = gText.hg; document.getElementById('t-hit-wrong').value = gText.hw;
+        document.getElementById('t-hit-miss').value = gText.hm; document.getElementById('t-combo').value = gText.cmb;
+        document.getElementById('t-fin-win').value = gText.fw; document.getElementById('t-fin-lose').value = gText.fl;
+        document.getElementById('t-stat-1').value = gText.s1; document.getElementById('t-stat-2').value = gText.s2;
+        document.getElementById('t-stat-3').value = gText.s3; document.getElementById('t-stat-4').value = gText.s4;
+        document.getElementById('t-stat-row').value = gText.sr;
+
+        // 3. Обновление UI существующих блоков с вопросами (только плейсхолдеры и кнопки, текст не трогаем!)
+        document.querySelectorAll('.question-block').forEach((block, index) => {
+            block.querySelector('h4').innerText = `${uiText.qsec.split(' ')[0]} ${index + 1}`;
+            block.querySelector('.remove-btn').innerText = uiText.delBtn;
+            block.querySelector('.q-text').placeholder = uiText.qPh;
+            block.querySelector('.q-opt-0').placeholder = `${uiText.optPh} 1`;
+            block.querySelector('.q-opt-1').placeholder = `${uiText.optPh} 2`;
+            block.querySelector('.q-opt-2').placeholder = `${uiText.optPh} 3`;
+            const sel = block.querySelector('.correct-select');
+            const curVal = sel.value; 
+            sel.options[0].text = `${uiText.curCor} 1`;
+            sel.options[1].text = `${uiText.curCor} 2`;
+            sel.options[2].text = `${uiText.curCor} 3`;
+            sel.value = curVal; 
+        });
+    }
+
+    // Создание НОВОГО блока вопроса
+    function addQuestionBlock() {
+        qCount++;
+        const uiText = langs[document.getElementById('lang-select').value].ui;
+        const div = document.createElement('div');
+        div.className = 'question-block';
+        div.innerHTML = `
+            <h4>${uiText.qsec.split(' ')[0]} ${qCount}</h4>
+            <button class="remove-btn" onclick="this.parentElement.remove()">${uiText.delBtn}</button>
+            <div class="form-group">
+                <input type="text" class="q-text" placeholder="${uiText.qPh}">
+            </div>
+            <div class="options-grid">
+                <input type="text" class="q-opt-0" placeholder="${uiText.optPh} 1">
+                <input type="text" class="q-opt-1" placeholder="${uiText.optPh} 2">
+                <input type="text" class="q-opt-2" placeholder="${uiText.optPh} 3">
+            </div>
+            <select class="correct-select">
+                <option value="0">${uiText.curCor} 1</option>
+                <option value="1">${uiText.curCor} 2</option>
+                <option value="2">${uiText.curCor} 3</option>
+            </select>
+        `;
+        // Безопасное добавление без затирания введенных данных в других блоках
+        document.getElementById('questions-container').appendChild(div);
+    }
+
+    function hexToRgb(hex) {
+        let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : "255, 255, 255";
+    }
+
+    // ГЕНЕРАЦИЯ БЕЗОПАСНОГО КОДА IFRAME
+    function generateIframe() {
+        const qBlocks = document.querySelectorAll('.question-block');
+        if (qBlocks.length === 0) { alert('Добавьте хотя бы 1 вопрос!'); return; }
+        
+        let questions = [];
+        qBlocks.forEach(b => {
+            questions.push({
+                q: b.querySelector('.q-text').value,
+                opt: [ b.querySelector('.q-opt-0').value, b.querySelector('.q-opt-1').value, b.querySelector('.q-opt-2').value ],
+                c: b.querySelector('.correct-select').value
+            });
+        });
+
+        const config = {
+            questions: questions,
+            texts: {
+                startTitle: document.getElementById('t-start-title').value, startDesc: document.getElementById('t-start-desc').value,
+                btnStart: document.getElementById('t-btn-start').value, btnRestart: document.getElementById('t-btn-restart').value,
+                progress: document.getElementById('t-progress').value, hitPerf: document.getElementById('t-hit-perfect').value,
+                hitGood: document.getElementById('t-hit-good').value, hitWrong: document.getElementById('t-hit-wrong').value,
+                hitMiss: document.getElementById('t-hit-miss').value, combo: document.getElementById('t-combo').value,
+                finWin: document.getElementById('t-fin-win').value, finLose: document.getElementById('t-fin-lose').value,
+                stat1: document.getElementById('t-stat-1').value, stat2: document.getElementById('t-stat-2').value,
+                stat3: document.getElementById('t-stat-3').value, stat4: document.getElementById('t-stat-4').value,
+                statRow: document.getElementById('t-stat-row').value
+            }
+        };
+
+        const font = document.getElementById('font-family').value;
+        const txtCol = document.getElementById('text-color').value;
+        const pBgRgb = hexToRgb(document.getElementById('panel-color').value);
+        const pOpac = document.getElementById('panel-opacity').value / 100;
+
+        let template = document.getElementById('game-template').innerHTML;
+        template = template.replace('{{VAR_FONT}}', font);
+        template = template.replace('{{VAR_TEXT_COLOR}}', txtCol);
+        template = template.replace('{{VAR_PANEL_BG}}', pBgRgb);
+        template = template.replace('{{VAR_PANEL_OPACITY}}', pOpac);
+        
+        // Надежное кодирование JSON (защита от слома скрипта кавычками)
+        const safeJson = JSON.stringify(config).replace(/</g, '\\u003c');
+        template = template.replace('{{VAR_JSON_CONFIG}}', safeJson);
+
+        // Идеальное кодирование для Genially с поддержкой ВСЕХ языков (в т.ч. русского и китайского)
+        const encodedHtml = encodeURIComponent(template);
+        const iframeStr = `<iframe src="data:text/html;charset=utf-8,${encodedHtml}" width="100%" height="720px" frameborder="0" allowfullscreen style="border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);"></iframe>`;
+        
+        document.getElementById('iframe-code').value = iframeStr;
+        document.getElementById('output-area').style.display = 'block';
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    function copyCode() {
+        const ta = document.getElementById('iframe-code');
+        ta.select(); document.execCommand('copy');
+        alert('Код скопирован! Теперь вставьте его в Genially (Insert -> </> Other)');
+    }
+
+    window.onload = () => {
+        applyLangPreset();
+        addQuestionBlock(); // Добавляем первый пустой блок
+    }
+</script>
+</body>
+</html>
