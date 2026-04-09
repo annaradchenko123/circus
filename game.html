@@ -18,7 +18,7 @@
             --border-width: 3px; 
         }
         
-        body { font-family: var(--font-family); background-color: #000; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; user-select: none; }
+        body { font-family: var(--font-family); background-color: transparent; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; user-select: none; }
         
         #game-wrapper { width: 100%; max-width: 1280px; aspect-ratio: 16 / 9; background-image: url('https://i.postimg.cc/HsxzZ6mn/image.png'); background-size: cover; background-position: center; background-repeat: no-repeat; position: relative; display: flex; overflow: hidden; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
         .overlay-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 100%); z-index: 1; }
@@ -61,7 +61,6 @@
         #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #f1c40f, #f39c12); transition: width 0.3s ease; }
         #progress-text { text-align: right; color: #f1c40f; font-weight: 700; font-size: 1.1rem; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0; }
 
-        /* НАСТРОЙКИ РАМКИ ПРИМЕНЕНЫ СЮДА */
         #question-display {
             background-color: var(--panel-bg); color: var(--text-color);
             padding: 15px 20px; border-radius: 15px; font-size: 1.6rem; font-weight: 700; text-align: center;
@@ -108,7 +107,7 @@
 <audio id="bg-music" loop preload="auto" crossorigin="anonymous"><source src="https://freepd.com/music/The%20Entertainer.mp3" type="audio/mpeg"></audio>
 
 <div id="game-wrapper">
-    <div class="overlay-bg"></div>
+    <div class="overlay-bg" id="game-overlay"></div>
     <div id="start-screen">
         <div class="start-content">
             <h2 id="start-title">КАК ИГРАТЬ?</h2>
@@ -174,7 +173,7 @@
         }
     };
 
-    // ПРИМЕНЕНИЕ НАСТРОЕК ОТ РЕДАКТОРА, ВКЛЮЧАЯ РАМКИ
+    // ПРИМЕНЕНИЕ НАСТРОЕК ОТ РЕДАКТОРА, ВКЛЮЧАЯ РАМКИ И ФОН
     if (customCFG) {
         if (customCFG.questions && customCFG.questions.length > 0) {
             gameConfig.questions = customCFG.questions.map(q => ({ text: q.q, options: q.opt, correctIndex: q.c }));
@@ -184,10 +183,20 @@
             document.documentElement.style.setProperty('--font-family', customCFG.design.font);
             document.documentElement.style.setProperty('--text-color', customCFG.design.color);
             document.documentElement.style.setProperty('--panel-bg', `rgba(${customCFG.design.bg}, ${customCFG.design.op})`);
-            
-            // Подключаем цвет и толщину рамок
             if(customCFG.design.bColor) document.documentElement.style.setProperty('--border-color', customCFG.design.bColor);
             if(customCFG.design.bWidth !== undefined) document.documentElement.style.setProperty('--border-width', customCFG.design.bWidth + 'px');
+            
+            // ЛОГИКА ФОНА ИГРЫ
+            let gameWrapper = document.getElementById('game-wrapper');
+            let gameOverlay = document.getElementById('game-overlay');
+            if (customCFG.design.noBg) {
+                gameWrapper.style.backgroundImage = 'none';
+                gameWrapper.style.backgroundColor = 'transparent';
+                gameOverlay.style.background = 'none'; // убираем затемнение, чтобы слайд Genially был светлым
+                gameWrapper.style.boxShadow = 'none';
+            } else if (customCFG.design.bgUrl && customCFG.design.bgUrl.trim() !== "") {
+                gameWrapper.style.backgroundImage = `url('${customCFG.design.bgUrl.trim()}')`;
+            }
         }
     }
 
