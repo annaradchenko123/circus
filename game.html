@@ -107,7 +107,7 @@
 <audio id="bg-music" loop preload="auto" crossorigin="anonymous"><source src="https://freepd.com/music/The%20Entertainer.mp3" type="audio/mpeg"></audio>
 
 <div id="game-wrapper">
-    <div class="overlay-bg"></div>
+    <div class="overlay-bg" id="game-overlay"></div>
     <div id="start-screen">
         <div class="start-content">
             <h2 id="start-title">КАК ИГРАТЬ?</h2>
@@ -188,15 +188,15 @@
             
             // ЛОГИКА ФОНА ИГРЫ (Прозрачный или Своя картинка)
             let gameWrapper = document.getElementById('game-wrapper');
-            let overlayBg = document.querySelector('.overlay-bg');
+            let overlayBg = document.getElementById('game-overlay');
             let progText = document.getElementById('progress-text');
             
             if (customCFG.design.noBg) {
                 gameWrapper.style.backgroundImage = 'none';
                 gameWrapper.style.backgroundColor = 'transparent';
                 gameWrapper.style.boxShadow = 'none';
-                if(overlayBg) overlayBg.style.background = 'transparent'; 
-                if(progText) progText.style.textShadow = 'none'; // Убираем тень текста, если фон прозрачный
+                if(overlayBg) overlayBg.style.background = 'none'; 
+                if(progText) progText.style.textShadow = 'none';
             } else if (customCFG.design.bgUrl && customCFG.design.bgUrl.trim() !== "") {
                 gameWrapper.style.backgroundImage = `url('${customCFG.design.bgUrl.trim()}')`;
             }
@@ -354,4 +354,49 @@
             slots[hitIndex].style.borderColor = "#e74c3c"; slots[hitIndex].style.backgroundColor = "#fdedec"; pointsEarned = gameConfig.points.wrong; message = gameConfig.texts.hw; color = "#e74c3c"; gameStats.wrong++; playSound('error'); 
         }
 
-        ui.fText.innerText = message; ui.fText.style
+        ui.fText.innerText = message; ui.fText.style.color = color; ui.fPoints.innerText = pointsEarned > 0 ? `+${pointsEarned}` : pointsEarned; ui.fPoints.style.color = color;
+
+        if (comboCount >= 2) { ui.fCombo.innerText = `🔥 ${gameConfig.texts.cmb} x${comboMultiplier} 🔥`; ui.fCombo.style.display = 'block'; ui.score.classList.add('combo-active'); } 
+        else { ui.fCombo.style.display = 'none'; ui.score.classList.remove('combo-active'); }
+
+        ui.feedback.style.opacity = '1'; ui.feedback.style.backdropFilter = 'blur(3px)'; updateScoreDisplay(pointsEarned);
+        setTimeout(() => { currentQuestionIndex++; loadQuestion(); }, 2000); 
+    }
+
+    function animateScore(start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            ui.score.innerText = Math.floor(start + (end - start) * (progress * (2 - progress)));
+            if (progress < 1) window.requestAnimationFrame(step); else ui.score.innerText = end;
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    function updateScoreDisplay(points) {
+        const oldScore = score; score += points; if(score < 0) score = 0; 
+        if(points !== 0) { if (!ui.score.classList.contains('combo-active')) { ui.score.classList.add('score-anim'); setTimeout(() => ui.score.classList.remove('score-anim'), 300); } animateScore(oldScore, score, 1000); }
+    }
+
+    function fireConfetti() { confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 }, colors: ['#ffd700', '#f1c40f', '#2ecc71', '#3498db'] }); }
+
+    function endGame() {
+        bgMusic.volume = 0.02; ui.progBar.style.width = '100%'; ui.finalScreen.style.display = 'flex'; ui.finalScore.innerText = score; ui.score.classList.remove('combo-active'); 
+        fireConfetti(); setTimeout(fireConfetti, 500);
+        
+        let rankStr = gameConfig.texts.r1;
+        if (score >= 2000) rankStr = gameConfig.texts.r4;
+        else if (score >= 1000) rankStr = gameConfig.texts.r3;
+        else if (score >= 500) rankStr = gameConfig.texts.r2;
+        ui.finalRank.innerText = rankStr;
+
+        ui.statPerfect.innerText = gameStats.perfect; ui.statGood.innerText = gameStats.good; ui.statWrong.innerText = gameStats.wrong;
+        let maxMult = Math.min(gameStats.maxCombo, 3);
+        ui.statMaxCombo.innerText = gameStats.maxCombo > 1 ? `x${maxMult} (${gameStats.maxCombo} ${gameConfig.texts.sr})` : "x1";
+    }
+
+    alignAnswersContainer();
+</script>
+</body>
+</html>
